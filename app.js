@@ -1010,7 +1010,18 @@ function openAuthModal() {
                     </button>
                     <button class="btn-provider" id="mock-login-email">
                         <i data-lucide="mail" style="width:20px;"></i>
-                        Continue with Email
+                        Log In with Email
+                    </button>
+                    
+                    <div style="display:flex; align-items:center; margin: 0.5rem 0;">
+                        <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+                        <span style="padding:0 1rem; color:var(--text-muted); font-size:0.85rem;">or</span>
+                        <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+                    </div>
+
+                    <button class="btn-provider" id="signup-email" style="background: var(--bg-primary); border-color: var(--accent-primary); color: var(--accent-primary);">
+                        <i data-lucide="user-plus" style="width:20px;"></i>
+                        Create New Account
                     </button>
                 </div>
                 
@@ -1052,11 +1063,20 @@ function openAuthModal() {
 
         // Toggle forms logic
         const emailBtn = overlay.querySelector('#mock-login-email');
+        const signupBtn = overlay.querySelector('#signup-email');
         const backBtn = overlay.querySelector('#back-to-providers');
         const buttonsContainer = overlay.querySelector('#auth-buttons-container');
         const emailForm = overlay.querySelector('#email-login-form');
+        const submitBtn = emailForm.querySelector('button[type="submit"]');
 
         emailBtn.addEventListener('click', () => {
+            submitBtn.textContent = 'Sign In';
+            buttonsContainer.style.display = 'none';
+            emailForm.style.display = 'flex';
+        });
+        
+        signupBtn.addEventListener('click', () => {
+            submitBtn.textContent = 'Create Account';
             buttonsContainer.style.display = 'none';
             emailForm.style.display = 'flex';
         });
