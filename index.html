@@ -11,13 +11,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <!-- Icons (Lucide via CDN) -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- PDF Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Chart.js for Donut & Bar Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -29,19 +31,22 @@
                 <i data-lucide="leaf"></i>
                 <span>EcoTrack</span>
             </div>
-            <div class="nav-right" style="display: flex; gap: 1rem; align-items: center;">
-                <button class="nav-button" id="dashboard-nav-btn">Dashboard</button>
-                <button class="nav-button" id="start-nav-btn">Start Assessment</button>
-                <button class="btn-outline" id="signin-nav-btn" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">Sign
-                    In</button>
-                <div id="user-profile"
-                    style="display: none; align-items: center; gap: 0.5rem; color: var(--text-primary);">
-                    <div class="user-avatar" id="user-avatar-icon"
-                        style="width: 35px; height: 35px; background: var(--accent-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #fff;">
-                        U</div>
-                    <button class="nav-button" id="signout-nav-btn"
-                        style="padding: 0.5rem 1.25rem; font-size: 0.9rem; background: transparent; border-color: transparent;">Sign
-                        Out</button>
+            
+            <div class="nav-links">
+                <a href="#landing" class="nav-link active">Overview</a>
+                <a href="#questionnaire" class="nav-link">Analysis</a>
+                <a href="#solutions" class="nav-link">Community</a>
+            </div>
+
+            <div class="nav-right">
+                <button class="icon-btn"><i data-lucide="search" style="width: 20px; height: 20px;"></i></button>
+                <button class="icon-btn auth-avatar" id="signin-nav-btn"><i data-lucide="user" style="width: 20px; height: 20px;"></i></button>
+                <div id="user-profile" style="display: none; align-items: center; gap: 0.5rem; border-left: 1px solid var(--border-subtle); padding-left: 1rem; margin-left: 0.5rem;">
+                    <a href="#profile" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-primary); transition: opacity var(--transition-fast);">
+                        <img id="nav-profile-pic" src="https://ui-avatars.com/api/?name=User&background=0f3d2b&color=fff" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                        <span style="font-size: 0.9rem; font-weight: 500;">User Profile</span>
+                    </a>
+                    <button class="icon-btn" id="signout-nav-btn" title="Sign Out"><i data-lucide="log-out" style="width: 18px; height: 18px;"></i></button>
                 </div>
             </div>
         </nav>

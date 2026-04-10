@@ -3,7 +3,7 @@
 // ==========================================================================
 
 const state = {
-    currentView: 'landing', // 'landing', 'questionnaire', 'results', 'manual-entry'
+    currentView: 'landing', // 'landing', 'questionnaire', 'results'
     currentQuestionIndex: 0,
     answers: {}, // { questionId: selectedOptionImpactValue }
     answerCategories: {}, // { categoryName: accumulatedValue }
@@ -14,59 +14,66 @@ const questions = [
     {
         id: 'q1',
         category: 'transportation',
-        title: 'How do you usually commute?',
-        description: 'Select your primary mode of transportation for daily travel.',
+        title: 'How do you primarily navigate the world?',
+        description: 'Select your primary mode of daily transit. This insight allows us to sculpt a precise portrait of your ecological footprint.',
         options: [
-            { id: 'car', label: 'Personal Car', icon: 'car-front', impact: 2000, desc: 'Gas or diesel vehicle' },
-            { id: 'ev', label: 'Electric Vehicle', icon: 'zap', impact: 800, desc: 'EV or Hybrid' },
-            { id: 'transit', label: 'Public Transit', icon: 'bus', impact: 500, desc: 'Bus, train, or subway' },
-            { id: 'bike', label: 'Bike / Walk', icon: 'bike', impact: 0, desc: 'Active commute' }
-        ]
+            { id: 'bike', label: 'Walk / Bike', icon: 'bike', impact: 0, desc: 'Elegant, carbon-neutral mobility powered by human vitality.' },
+            { id: 'car', label: 'Gasoline Car', icon: 'car', impact: 2000, desc: 'The traditional combustion narrative of modern travel.' },
+            { id: 'diesel', label: 'Diesel Car', icon: 'fuel', impact: 2200, desc: 'Long-range efficiency for extensive geographical reach.' },
+            { id: 'ev', label: 'Electric Car', icon: 'zap', impact: 800, desc: 'Purely digital propulsion powered by renewable energy potential.', recommended: true },
+            { id: 'hybrid', label: 'Hybrid Car', icon: 'battery-charging', impact: 1200, desc: 'Sophisticated duality of electric silence and range stability.' },
+            { id: 'motorcycle', label: 'Motorcycle', icon: 'bike', impact: 900, desc: 'Streamlined individual transit for agile urban movement.' }
+        ],
+        showCadence: true
     },
     {
         id: 'q2',
         category: 'diet',
-        title: 'What best describes your diet?',
-        description: 'Meat consumption is a significant factor in carbon footprints.',
+        title: 'What orchestrates your dietary profile?',
+        description: 'The narrative of our plates deeply impacts global emissions. Select your primary culinary philosophy.',
         options: [
-            { id: 'meat-heavy', label: 'Meat Heavy', icon: 'drumstick', impact: 2500, desc: 'Meat most days' },
-            { id: 'balanced', label: 'Average', icon: 'utensils', impact: 1500, desc: 'Mix of meat & plant-based' },
-            { id: 'vegetarian', label: 'Vegetarian', icon: 'leaf', impact: 800, desc: 'No meat, just dairy/eggs' },
-            { id: 'vegan', label: 'Vegan', icon: 'carrot', impact: 400, desc: 'Plant-based only' }
-        ]
+            { id: 'meat-heavy', label: 'Meat Heavy', icon: 'drumstick', impact: 2500, desc: 'A rich traditional palette frequently featuring animal proteins.' },
+            { id: 'balanced', label: 'Balanced Omnivore', icon: 'utensils', impact: 1500, desc: 'A mindful equilibrium of plant and animal sources.' },
+            { id: 'vegetarian', label: 'Vegetarian', icon: 'leaf', impact: 800, desc: 'A compassionate approach avoiding meat, utilizing dairy.' },
+            { id: 'vegan', label: 'Plant-Based / Vegan', icon: 'carrot', impact: 400, desc: 'A strictly botanical philosophy minimizing direct animal impact.', recommended: true }
+        ],
+        showCadence: false
     },
     {
         id: 'q3',
         category: 'energy',
-        title: 'How is your home powered?',
-        description: 'Household energy usage and sourcing.',
+        title: 'How is your sanctuary energized?',
+        description: 'Residential power flows constitute a substantial portion of your footprint. What illuminates your home?',
         options: [
-            { id: 'grid-coal', label: 'Standard Grid', icon: 'plug', impact: 3000, desc: 'Mostly fossil fuels' },
-            { id: 'mixed', label: 'Mixed Energy', icon: 'factory', impact: 1800, desc: 'Standard mix, some energy-saving' },
-            { id: 'renewable', label: 'Renewable', icon: 'sun', impact: 200, desc: 'Solar, wind, or green plan' }
-        ]
+            { id: 'grid-coal', label: 'Standard Grid', icon: 'plug', impact: 3000, desc: 'The default infrastructural flow, often reliant on fossil fuels.' },
+            { id: 'mixed', label: 'Mixed Hybrid', icon: 'factory', impact: 1800, desc: 'A standard utility mix offset by some efficient practices.' },
+            { id: 'renewable', label: '100% Renewable', icon: 'sun', impact: 200, desc: 'Powered entirely by wind, solar, or verified green infrastructure.', recommended: true }
+        ],
+        showCadence: false
     },
     {
         id: 'q4',
         category: 'shopping',
-        title: 'What are your shopping habits?',
-        description: 'Consider clothing, electronics, and general goods.',
+        title: 'What is your consumption cadence?',
+        description: 'The lifecycle of material goods requires immense energy. How often do you acquire new items?',
         options: [
-            { id: 'frequent', label: 'Frequent', icon: 'shopping-bag', impact: 1500, desc: 'Buy new items often' },
-            { id: 'average', label: 'Average', icon: 'package', impact: 800, desc: 'Buy what I need occasionally' },
-            { id: 'thrifting', label: 'Sustainable', icon: 'recycle', impact: 300, desc: 'Second-hand and repaired items' }
-        ]
+            { id: 'frequent', label: 'High Frequency', icon: 'shopping-bag', impact: 2500, desc: 'Regular acquisition of fast fashion and new technologies.' },
+            { id: 'average', label: 'Moderate', icon: 'package', impact: 1200, desc: 'Occasional, necessary purchases interspersed over time.' },
+            { id: 'sustainable', label: 'Minimal / Circular', icon: 'recycle', impact: 400, desc: 'Prioritizing longevity, second-hand, and ethical creation.', recommended: true }
+        ],
+        showCadence: false
     },
     {
         id: 'q5',
         category: 'travel',
-        title: 'How often do you fly?',
-        description: 'Air travel significantly boosts your annual footprint.',
+        title: 'How expansive is your air travel?',
+        description: 'Aviation creates significant high-altitude emissions. What is your annual flight frequency?',
         options: [
-            { id: 'frequent-flyer', label: 'Frequent', icon: 'plane-takeoff', impact: 4000, desc: '3+ round trips a year' },
-            { id: 'occasional', label: 'Occasional', icon: 'plane', impact: 1200, desc: '1-2 round trips a year' },
-            { id: 'rare', label: 'Rarely / Never', icon: 'palmtree', impact: 100, desc: 'Mostly local travel' }
-        ]
+            { id: 'frequent', label: 'Extensive (3+ flights)', icon: 'plane-takeoff', impact: 4500, desc: 'Frequent global traversal for business or broad exploration.' },
+            { id: 'occasional', label: 'Moderate (1-2 flights)', icon: 'plane', impact: 1500, desc: 'Occasional journeys or annual extended vacations.' },
+            { id: 'rare', label: 'Minimal / Local', icon: 'map-pin', impact: 200, desc: 'Primarily terrestrial movement focused within regional borders.', recommended: true }
+        ],
+        showCadence: false
     }
 ];
 
@@ -75,59 +82,71 @@ const questions = [
 // ==========================================================================
 
 const DOM = {
-    main: document.getElementById('main-content'),
-    navBtn: document.getElementById('start-nav-btn'),
-    dashboardBtn: document.getElementById('dashboard-nav-btn'),
-    logo: document.querySelector('.logo'),
-    signinBtn: document.getElementById('signin-nav-btn'),
-    signoutBtn: document.getElementById('signout-nav-btn'),
-    userProfile: document.getElementById('user-profile'),
-    userAvatar: document.getElementById('user-avatar-icon')
+    main: document.getElementById('main-content')
 };
 
+function saveState() {
+    localStorage.setItem('ecoTrackState', JSON.stringify(state));
+}
+
+function loadState() {
+    const saved = localStorage.getItem('ecoTrackState');
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            state.user = parsed.user || null;
+            state.answers = parsed.answers || {};
+            state.answerCategories = parsed.answerCategories || {};
+        } catch (e) {
+            console.error('Failed to load state', e);
+        }
+    }
+}
+
 function init() {
+    loadState();
     setupGlobalListeners();
-    handleRoute(); // initial render based on current hash
+    handleRoute(); 
 }
 
 function setupGlobalListeners() {
-    // Listen for hash changes to drive routing
     window.addEventListener('hashchange', handleRoute);
-
-    DOM.navBtn.addEventListener('click', () => {
-        if (state.currentView !== 'questionnaire') {
-            resetState();
-            window.location.hash = '#questionnaire';
-        }
-    });
-
-    DOM.logo.addEventListener('click', () => {
-        window.location.hash = '#landing';
-    });
-
-    if (DOM.dashboardBtn) {
-        DOM.dashboardBtn.addEventListener('click', () => {
-            window.location.hash = '#dashboard';
-        });
+    
+    const signinBtn = document.getElementById('signin-nav-btn');
+    if (signinBtn) {
+        signinBtn.addEventListener('click', openAuthModal);
     }
-
-    if (DOM.signinBtn) {
-        DOM.signinBtn.addEventListener('click', openAuthModal);
-    }
-
-    if (DOM.signoutBtn) {
-        DOM.signoutBtn.addEventListener('click', () => {
+    
+    const signoutBtn = document.getElementById('signout-nav-btn');
+    if (signoutBtn) {
+        signoutBtn.addEventListener('click', () => {
             state.user = null;
+            saveState();
             updateAuthUI();
+            if (state.currentView !== 'landing') {
+                window.location.hash = '#landing';
+            } else {
+                renderView(); // force re-render if already on landing
+            }
         });
     }
+    
+    // Initial UI check
+    updateAuthUI();
 }
 
 function handleRoute() {
     const hash = window.location.hash.slice(1) || 'landing';
+    
+    // Simple navigation update
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + hash) {
+            link.classList.add('active');
+        }
+    });
 
-    // Only allow valid views
-    if (['landing', 'questionnaire', 'results', 'manual-entry', 'dashboard', 'solutions', 'about-us'].includes(hash)) {
+    if (['landing', 'questionnaire', 'results', 'solutions', 'profile'].includes(hash)) {
         state.currentView = hash;
     } else {
         state.currentView = 'landing';
@@ -144,41 +163,37 @@ function resetState() {
 }
 
 function renderView() {
-    DOM.main.innerHTML = ''; // Clear current content
-
-    // Update Nav Button based on context
-    if (state.currentView === 'landing' || state.currentView === 'results' || state.currentView === 'dashboard' || state.currentView === 'solutions' || state.currentView === 'about-us') {
-        DOM.navBtn.style.display = 'block';
-        DOM.navBtn.textContent = 'Start Assessment';
-    } else {
-        DOM.navBtn.style.display = 'none';
-    }
+    DOM.main.innerHTML = ''; 
 
     switch (state.currentView) {
         case 'landing':
-            DOM.main.appendChild(createLandingView());
-            break;
-        case 'dashboard':
-            DOM.main.appendChild(createDashboardView());
-            break;
-        case 'solutions':
-            DOM.main.appendChild(createSolutionsView());
-            break;
-        case 'about-us':
-            DOM.main.appendChild(createAboutUsView());
+            if (state.user) {
+                DOM.main.appendChild(createDashboardView());
+            } else {
+                DOM.main.appendChild(createLandingView());
+            }
             break;
         case 'questionnaire':
             DOM.main.appendChild(createQuestionnaireView());
             break;
-        case 'manual-entry':
-            DOM.main.appendChild(createManualEntryView());
-            break;
         case 'results':
             DOM.main.appendChild(createResultsView());
             break;
+        case 'solutions':
+            // Fallback for solutions tab mock
+            const div = document.createElement('div');
+            div.innerHTML = '<div style="text-align:center; padding: 100px;"><h2>Community & Solutions</h2><p>Coming Soon</p></div>';
+            DOM.main.appendChild(div);
+            break;
+        case 'profile':
+            if (!state.user) {
+                window.location.hash = '#landing';
+            } else {
+                DOM.main.appendChild(createProfileView());
+            }
+            break;
     }
 
-    // Re-initialize Lucide icons for dynamically added content
     lucide.createIcons();
 }
 
@@ -191,95 +206,397 @@ function createLandingView() {
     container.className = 'landing-view';
 
     container.innerHTML = `
-        <h1 class="landing-title">Understand Your<br><span>Environmental Impact</span></h1>
-        <p class="landing-subtitle">Choose how you'd like to calculate your carbon footprint:</p>
-        
-        <div class="calculation-options" style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap;">
-            <button class="btn-primary" id="guided-btn" style="font-size: 1.1rem; padding: 1rem 2rem; display: flex; align-items: center; gap: 0.5rem;">
-                <i data-lucide="list-checks"></i> Guided Assessment
+        <div class="landing-bg"></div>
+        <div class="landing-left">
+            <div class="pill-badge">
+                <i data-lucide="leaf" style="width:14px; height:14px;"></i> Carbon Footprint Calculator
+            </div>
+            <h1 class="landing-title">Measure Your Impact,<br><span>Change Your Future</span></h1>
+            <p class="landing-subtitle">Understand how your daily choices affect the planet. Get a personalized carbon footprint analysis and AI-powered recommendations to live more sustainably.</p>
+            
+            <button class="btn-primary" id="start-btn" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                Start Your Assessment <i data-lucide="arrow-right" style="width: 18px; margin-left: 8px;"></i>
             </button>
-            <button class="btn-secondary" id="manual-btn" style="font-size: 1.1rem; padding: 1rem 2rem; display: flex; align-items: center; gap: 0.5rem;">
-                <i data-lucide="calculator"></i> Manual Entry
-            </button>
+
+            <div class="landing-stats">
+                <div class="stat-item">
+                    <h4>5 min</h4>
+                    <p>Assessment</p>
+                </div>
+                <div class="stat-item">
+                    <h4 style="color: var(--text-primary);">AI-Powered</h4>
+                    <p>Insights</p>
+                </div>
+                <div class="stat-item">
+                    <h4 style="color: var(--text-primary);">Free</h4>
+                    <p>Forever</p>
+                </div>
+            </div>
         </div>
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <i data-lucide="calculator"></i>
-                <h3>Accurate Estimation</h3>
-                <p>Based on standardized emissions data across major lifestyle categories.</p>
-            </div>
-            <div class="feature-card">
-                <i data-lucide="target"></i>
-                <h3>Personalized Plan</h3>
-                <p>Get recommendations tailored specifically to your habits and choices.</p>
-            </div>
-            <div class="feature-card">
-                <i data-lucide="tree-pine"></i>
-                <h3>Offset Solutions</h3>
-                <p>Discover real-world projects to neutralize your remaining emissions.</p>
+        <div class="landing-right">
+            <div class="hero-image-container">
+                <img src="sphere-moss.png" alt="Glass sphere resting on lush moss reflecting sunlight">
+                <div class="hero-floating-card">
+                    <i data-lucide="tree-pine"></i>
+                    <div>
+                        <div class="title">Average saved</div>
+                        <div class="value">2.3 tons/year</div>
+                    </div>
+                </div>
             </div>
         </div>
     `;
 
     setTimeout(() => {
-        container.querySelector('#guided-btn').addEventListener('click', () => {
-            resetState();
-            window.location.hash = '#questionnaire';
-        });
-        container.querySelector('#manual-btn').addEventListener('click', () => {
-            resetState();
-            window.location.hash = '#manual-entry';
+        container.querySelector('#start-btn').addEventListener('click', () => {
+            if (!state.user) {
+                openAuthModal();
+            } else {
+                resetState();
+                window.location.hash = '#questionnaire';
+            }
         });
     }, 0);
 
     return container;
 }
 
+function createDashboardView() {
+    const container = document.createElement('div');
+    container.className = 'user-dashboard-view';
+    
+    // Default to 'Julian' if mock name isn't set, to reflect the screenshot precisely, but dynamic
+    const userName = state.user && state.user.name ? state.user.name.split(' ')[0] : 'Julian';
+
+    container.innerHTML = `
+        <div class="dash-header-row">
+            <div class="dash-header-text">
+                <h1>Hello, ${userName}</h1>
+                <p>Your conscious efforts are visible. Your carbon footprint is <strong>down 12%</strong> this month. Keep shaping a greener tomorrow.</p>
+            </div>
+            <button class="btn-primary" onclick="window.location.hash='#questionnaire'" style="background: #0f3d2b; padding: 0.9rem 1.8rem; font-weight: 600;">Log Daily Activity</button>
+        </div>
+
+        <div class="dash-top-grid">
+            <div class="dash-score-card">
+                <div class="score-content">
+                    <h4>Sustainability Score</h4>
+                    <div class="score-main-val">840 <span>Eco Points</span></div>
+                    
+                    <div class="score-stats-row">
+                        <div class="score-stat-col">
+                            <p>Carbon Saved</p>
+                            <div><strong>12.4</strong> <span>kg</span></div>
+                        </div>
+                        <div class="score-stat-col">
+                            <p>Trees Saved</p>
+                            <div><strong>3.2</strong> <span>units</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-circle-container">
+                    <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; position: absolute; top:0; left:0; transform: rotate(-90deg);">
+                        <path stroke="rgba(255,255,255,0.2)" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path stroke="#fff" stroke-dasharray="85, 100" stroke-width="3" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="chart-circle-inner">
+                        <i data-lucide="leaf" style="width: 24px;"></i>
+                        <p>Excellent</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-challenges-card">
+                <div class="challenges-header">
+                    <h3>Active Challenges</h3>
+                    <i data-lucide="award" style="color:var(--text-secondary);"></i>
+                </div>
+                
+                <div class="challenge-item">
+                    <div class="challenge-info">
+                        <strong>Plastic Free Week</strong>
+                        <div class="challenge-toggle ${state.user?.challenges?.plasticFree ? 'active' : ''}" data-challenge="plasticFree"></div>
+                    </div>
+                    <div class="challenge-progress-bar"><div class="challenge-progress-fill" style="width: 70%; background: #0f3d2b;"></div></div>
+                    <div class="challenge-detail">5 of 7 days completed</div>
+                </div>
+                
+                <div class="challenge-item">
+                    <div class="challenge-info">
+                        <strong>Green Commute</strong>
+                        <div class="challenge-toggle ${state.user?.challenges?.greenCommute ? 'active' : ''}" data-challenge="greenCommute"></div>
+                    </div>
+                    <div class="challenge-progress-bar"><div class="challenge-progress-fill" style="width: 20%; background: #e2e8f0;"></div></div>
+                    <div class="challenge-detail">Keep going! You're making impact.</div>
+                </div>
+                
+                <button class="btn-secondary-light">Browse All Challenges</button>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="icon-wrapper"><i data-lucide="car"></i></div>
+                <p class="title">Travel</p>
+                <p class="val">120.5 <span>kg CO2e</span></p>
+                <div class="metric-trend up"><i data-lucide="trending-up" style="width:14px;"></i> 4% from last week</div>
+            </div>
+            <div class="metric-card">
+                <div class="icon-wrapper"><i data-lucide="zap"></i></div>
+                <p class="title">Energy</p>
+                <p class="val">84.2 <span>kg CO2e</span></p>
+                <div class="metric-trend down"><i data-lucide="trending-down" style="width:14px;"></i> 12% from last week</div>
+            </div>
+            <div class="metric-card">
+                <div class="icon-wrapper"><i data-lucide="utensils"></i></div>
+                <p class="title">Diet</p>
+                <p class="val">45.0 <span>kg CO2e</span></p>
+                <div class="metric-trend down"><i data-lucide="trending-down" style="width:14px;"></i> 8% from last week</div>
+            </div>
+            <div class="metric-card">
+                <div class="icon-wrapper"><i data-lucide="trash-2"></i></div>
+                <p class="title">Waste</p>
+                <p class="val">18.1 <span>kg CO2e</span></p>
+                <div class="metric-trend stable"><i data-lucide="minus" style="width:14px;"></i> Stable impact</div>
+            </div>
+        </div>
+
+        <div class="insight-row">
+            <div class="insight-content">
+                <h4>Curator's Insight</h4>
+                <h2>'The greatest threat to our planet is the belief that someone else will save it.'</h2>
+                <p>— Robert Swan, Author & Explorer</p>
+            </div>
+            <div class="insight-img-container">
+                <img src="forest-insight.png" alt="Black and white magnificent redwood forest scene">
+            </div>
+        </div>
+    `;
+
+    // Ensure icon execution since they were populated via innerHTML
+    setTimeout(() => { 
+        lucide.createIcons(); 
+        
+        const toggles = container.querySelectorAll('.challenge-toggle');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                toggle.classList.toggle('active');
+                const chalName = toggle.getAttribute('data-challenge');
+                if (!state.user.challenges) state.user.challenges = {};
+                state.user.challenges[chalName] = toggle.classList.contains('active');
+                saveState();
+            });
+        });
+    }, 0);
+    return container;
+}
+
+function createProfileView() {
+    const container = document.createElement('div');
+    container.className = 'profile-view';
+    
+    container.innerHTML = `
+        <div class="profile-header">
+            <h2>Account Settings</h2>
+            <p>Update your profile details and preferences.</p>
+        </div>
+        
+        <form id="profile-form" class="profile-form">
+            <div class="form-group">
+                <label>Profile Image</label>
+                <div style="display:flex; gap:1rem; align-items:center;">
+                    <img id="profile-preview-img" src="${state.user?.avatar || 'https://ui-avatars.com/api/?name=' + (state.user?.name || 'User') + '&background=0f3d2b&color=fff'}" alt="Preview" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">
+                    <input type="file" id="profile-avatar-file" accept="image/*" style="flex:1;">
+                </div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="profile-name" value="${state.user?.name || ''}" required placeholder="Jane Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email Registered</label>
+                    <input type="email" id="profile-email" value="${state.user?.email || ''}" placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="profile-phone" value="${state.user?.phone || ''}" placeholder="+1 (555) 000-0000">
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="profile-dob" value="${state.user?.dob || ''}">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="profile-gender" style="padding: 0.8rem 1rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 1rem; background: var(--bg-primary); color: var(--text-primary);">
+                        <option value="" ${!state.user?.gender ? 'selected' : ''}>Prefer not to say</option>
+                        <option value="male" ${state.user?.gender === 'male' ? 'selected' : ''}>Male</option>
+                        <option value="female" ${state.user?.gender === 'female' ? 'selected' : ''}>Female</option>
+                        <option value="nonbinary" ${state.user?.gender === 'nonbinary' ? 'selected' : ''}>Non-binary</option>
+                        <option value="other" ${state.user?.gender === 'other' ? 'selected' : ''}>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Current Emission Score (kg CO2e)</label>
+                    <input type="number" id="profile-score" value="${state.user?.score || ''}" placeholder="e.g. 450">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="profile-address" value="${state.user?.address || ''}" placeholder="123 Eco Street, Green City">
+            </div>
+            <div class="form-group">
+                <label>About You</label>
+                <textarea id="profile-about" rows="3" placeholder="I am passionate about reducing my footprint...">${state.user?.about || ''}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Achievements</label>
+                <textarea id="profile-achievements" rows="3" placeholder="Completed Veganuary 2024...">${state.user?.achievements || ''}</textarea>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="margin-top: 1rem;">Save Changes</button>
+        </form>
+    `;
+    
+    setTimeout(() => {
+        const form = container.querySelector('#profile-form');
+        const imgPreview = container.querySelector('#profile-preview-img');
+        const fileInput = container.querySelector('#profile-avatar-file');
+        let currentBase64Avatar = state.user?.avatar || null;
+        
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentBase64Avatar = event.target.result;
+                    imgPreview.src = currentBase64Avatar;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = container.querySelector('#profile-name').value;
+            const email = container.querySelector('#profile-email').value;
+            const phone = container.querySelector('#profile-phone').value;
+            const dob = container.querySelector('#profile-dob').value;
+            const gender = container.querySelector('#profile-gender').value;
+            const score = container.querySelector('#profile-score').value;
+            const address = container.querySelector('#profile-address').value;
+            const about = container.querySelector('#profile-about').value;
+            const achievements = container.querySelector('#profile-achievements').value;
+            
+            state.user.name = name;
+            state.user.email = email;
+            state.user.phone = phone;
+            state.user.dob = dob;
+            state.user.gender = gender;
+            state.user.score = score;
+            state.user.address = address;
+            state.user.about = about;
+            state.user.achievements = achievements;
+            
+            if (currentBase64Avatar) {
+                state.user.avatar = currentBase64Avatar;
+            } else {
+                delete state.user.avatar;
+            }
+            
+            saveState();
+            updateAuthUI();
+            
+            window.location.hash = '#landing';
+        });
+    }, 0);
+    
+    return container;
+}
+
 
 function createQuestionnaireView() {
     const container = document.createElement('div');
-    container.className = 'question-view';
+    container.className = 'question-view-layout';
 
     const maxQuestions = questions.length;
-    const progressPercent = (state.currentQuestionIndex / maxQuestions) * 100;
+    const currentStep = state.currentQuestionIndex + 1;
+    const progressPercent = (currentStep / maxQuestions) * 100;
     const currentQ = questions[state.currentQuestionIndex];
 
     container.innerHTML = `
-        <div class="glass-card">
-            <div class="progress-container">
-                <div class="progress-bar" style="width: ${progressPercent}%"></div>
-            </div>
-            
-            <div class="question-header">
-                <h2>${currentQ.title}</h2>
-                <p>${currentQ.description}</p>
-            </div>
+        <div class="q-header-top">
+            <div class="q-perspective">Perspective Journey</div>
+            <h2 class="q-title-large">
+                <div>Step ${currentStep} <span>of ${maxQuestions}</span><br>${currentQ.category.charAt(0).toUpperCase() + currentQ.category.slice(1)}</div>
+                
+                <div class="calibration-bar">
+                    <div class="cal-text"><span>Calibration</span> <span>${Math.round(progressPercent)}%</span></div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: ${progressPercent}%"></div>
+                    </div>
+                </div>
+            </h2>
+        </div>
+
+        <div class="q-main-card">
+            <h2>${currentQ.title}</h2>
+            <p>${currentQ.description}</p>
 
             <div class="options-grid">
                 ${currentQ.options.map(opt => {
-        const isSelected = state.answers[currentQ.id] === opt.impact;
-        return `
+                    const isSelected = state.answers[currentQ.id] === opt.impact;
+                    return `
                         <div class="option-card ${isSelected ? 'selected' : ''}" data-impact="${opt.impact}">
-                            <div class="option-icon">
-                                <i data-lucide="${opt.icon}"></i>
+                            <i data-lucide="check" class="check-icon" style="width: 16px;"></i>
+                            <div class="icon-wrapper">
+                                <i data-lucide="${opt.icon}" style="width: 24px; height: 24px;"></i>
                             </div>
-                            <div>
-                                <div class="option-title">${opt.label}</div>
-                                <div class="option-desc">${opt.desc}</div>
-                            </div>
+                            <h3>${opt.label}</h3>
+                            <p>${opt.desc}</p>
                         </div>
                     `;
-    }).join('')}
+                }).join('')}
             </div>
 
-            <div class="question-actions">
-                <button class="btn-secondary" id="prev-btn" ${state.currentQuestionIndex === 0 ? 'style="visibility:hidden"' : ''}>
-                    Previous
+            ${currentQ.showCadence ? `
+            <div class="cadence-section">
+                <h4>Weekly driving cadence</h4>
+                <div class="cadence-options">
+                    <button class="cadence-pill">0 — 50 km</button>
+                    <button class="cadence-pill selected">51 — 150 km</button>
+                    <button class="cadence-pill">151 — 300 km</button>
+                    <button class="cadence-pill">300+ km</button>
+                    <button class="cadence-pill">I do not drive</button>
+                </div>
+            </div>
+            ` : ''}
+
+            <div class="question-actions-row">
+                <button class="btn-outline" id="prev-btn" style="${state.currentQuestionIndex === 0 ? 'visibility:hidden;' : ''} display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;">
+                    <i data-lucide="arrow-left" style="width: 18px;"></i> Back
                 </button>
-                <button class="btn-primary" id="next-btn" ${state.answers[currentQ.id] !== undefined ? '' : 'disabled style="opacity:0.5; cursor:not-allowed;"'}>
-                    ${state.currentQuestionIndex === maxQuestions - 1 ? 'See Results' : 'Next Question'}
+                <button class="btn-primary" id="next-btn" style="padding: 1rem 2rem; border-radius: var(--radius-full);" ${state.answers[currentQ.id] !== undefined ? '' : 'disabled style="opacity:0.5; cursor:not-allowed;"'}>
+                    ${state.currentQuestionIndex === maxQuestions - 1 ? 'Calculate Assessment' : 'Continue to Next Profile'}
                 </button>
+            </div>
+        </div>
+
+        <div class="info-cards-row">
+            <div class="info-card">
+                <div class="info-icon"><i data-lucide="sparkles"></i></div>
+                <div>
+                    <h4>The Significance of ${currentQ.category.charAt(0).toUpperCase() + currentQ.category.slice(1)}</h4>
+                    <p>Your choices in this category dictate roughly 15-25% of the average global emission narrative. Mindful shifts here directly rewrite your ecological impact trajectory significantly over time.</p>
+                </div>
+            </div>
+            <div class="info-card dark">
+                <p>Sustainable Environmental Intelligence</p>
+                <h3>Every conscious choice is a signature on the horizon.</h3>
             </div>
         </div>
     `;
@@ -288,23 +605,27 @@ function createQuestionnaireView() {
     setTimeout(() => {
         const optionCards = container.querySelectorAll('.option-card');
         const nextBtn = container.querySelector('#next-btn');
+        const cadencePills = container.querySelectorAll('.cadence-pill');
 
         optionCards.forEach(card => {
             card.addEventListener('click', () => {
-                // Remove selected class from all
                 optionCards.forEach(c => c.classList.remove('selected'));
-                // Add to clicked
                 card.classList.add('selected');
 
-                // Save state
                 const impact = parseInt(card.getAttribute('data-impact'), 10);
                 state.answers[currentQ.id] = impact;
                 state.answerCategories[currentQ.category] = impact;
 
-                // Enable next
                 nextBtn.disabled = false;
                 nextBtn.style.opacity = '1';
                 nextBtn.style.cursor = 'pointer';
+            });
+        });
+
+        cadencePills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                cadencePills.forEach(p => p.classList.remove('selected'));
+                pill.classList.add('selected');
             });
         });
 
@@ -331,214 +652,181 @@ function createQuestionnaireView() {
 }
 
 
-function createManualEntryView() {
-    const container = document.createElement('div');
-    container.className = 'manual-entry-view';
-
-    container.innerHTML = `
-        <div class="glass-card" style="margin: 0 auto;">
-            <div class="question-header">
-                <h2>Manual Energy Usage Entry</h2>
-                <p>Enter your estimated annual usage for the following categories to calculate your footprint.</p>
-            </div>
-            <form id="manual-entry-form" class="manual-form">
-                <div class="form-group">
-                    <label>Transportation (Miles driven per year)</label>
-                    <div class="input-with-icon">
-                        <i data-lucide="car"></i>
-                        <input type="number" id="manual-transport" placeholder="e.g., 10000" class="manual-input" required min="0">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Home Energy (kWh per year)</label>
-                    <div class="input-with-icon">
-                        <i data-lucide="zap"></i>
-                        <input type="number" id="manual-energy" placeholder="e.g., 10500" class="manual-input" required min="0">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Flights (Hours flown per year)</label>
-                    <div class="input-with-icon">
-                        <i data-lucide="plane"></i>
-                        <input type="number" id="manual-flights" placeholder="e.g., 10" class="manual-input" required min="0">
-                    </div>
-                </div>
-                
-                <div class="question-actions" style="margin-top: 2rem; justify-content: center;">
-                    <button type="submit" class="btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem; width: 100%; max-width: 300px;">
-                        Calculate Results
-                    </button>
-                </div>
-            </form>
-        </div>
-    `;
-
-    setTimeout(() => {
-        const form = container.querySelector('#manual-entry-form');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            // Basic generic calculations, mapping values to estimated kg CO2e
-            const transportMiles = parseFloat(container.querySelector('#manual-transport').value) || 0;
-            const transportImpact = Math.round(transportMiles * 0.404); // ~0.404 kg CO2 per mile driven
-
-            const energyKwh = parseFloat(container.querySelector('#manual-energy').value) || 0;
-            const energyImpact = Math.round(energyKwh * 0.385); // ~0.385 kg CO2 per kWh
-
-            const flightsHours = parseFloat(container.querySelector('#manual-flights').value) || 0;
-            const flightImpact = Math.round(flightsHours * 250); // ~250 kg CO2 per hour of flying
-
-            // Set state categories directly (adding some average assumptions for un-entered items like Diet/Shopping)
-            state.answerCategories = {
-                transportation: transportImpact,
-                energy: energyImpact,
-                travel: flightImpact,
-                diet: 1500, // Average kg
-                shopping: 1000 // Average kg
-            };
-
-            // Set state answers to be total sum parts
-            state.answers = {
-                transport: transportImpact,
-                energy: energyImpact,
-                travel: flightImpact,
-                diet: 1500,
-                shopping: 1000
-            };
-
-            // Navigate to results
-            window.location.hash = '#results';
-        });
-    }, 0);
-
-    return container;
-}
-
 function createResultsView() {
     const container = document.createElement('div');
-    container.className = 'results-view';
+    container.className = 'results-view-layout';
 
-    // Calculate total score
     let totalScore = 0;
     for (const val of Object.values(state.answers)) {
         totalScore += val;
     }
+    
+    // Simulated category breakdown if they skipped
+    const cats = Object.keys(state.answerCategories).length > 0 ? state.answerCategories : {
+        transport: 2423,
+        diet: 2000,
+        energy: 2568,
+        shopping: 3500,
+        travel: 10700
+    };
+    
+    if (Object.keys(state.answerCategories).length === 0) totalScore = 21191;
 
-    // Determine category based on roughly average numbers (Global avg is ~4.7 tons, US is ~15 tons, let's use kg).
-    let scoreClass = 'low';
-    if (totalScore > 6000) scoreClass = 'medium';
-    if (totalScore > 10000) scoreClass = 'high';
+    const tons = (totalScore / 1000).toFixed(1);
+    
+    const isHigh = totalScore > 10000;
 
     container.innerHTML = `
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <div class="results-header">
-                <h2>Your Annual Carbon Footprint</h2>
-                <div class="score-display ${scoreClass}">
-                    <div class="score-value">${(totalScore / 1000).toFixed(1)}</div>
-                    <div class="score-unit">Tons of CO₂e</div>
+        <div class="results-header-actions">
+            <a href="#questionnaire" class="back-link"><i data-lucide="arrow-left" style="width:16px;"></i> Back to Assessment</a>
+            <button class="btn-secondary" id="download-pdf-btn"><i data-lucide="download" style="width:18px; margin-right:8px;"></i> Download PDF</button>
+        </div>
+
+        <h2 class="page-title">Your Carbon Footprint</h2>
+        <p class="page-subtitle" style="margin-bottom: 2rem;">Assessment from ${new Date().toLocaleDateString()}</p>
+
+        <div class="top-cards-row">
+            <div class="total-card">
+                <div class="total-card-label">Total Footprint</div>
+                <div class="total-val">${tons}</div>
+                <div class="total-unit">tons CO2 / year</div>
+                
+                <div class="impact-badge ${isHigh ? 'high' : 'low'}">
+                    <i data-lucide="${isHigh ? 'alert-triangle' : 'leaf'}" style="width:14px;"></i> 
+                    ${isHigh ? 'High Impact' : 'Sustainable Impact'}
                 </div>
-                <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto;">
-                    ${getScoreMessage(scoreClass)}
-                </p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">Average is ~10 tons/year</p>
             </div>
 
-            <h3 class="section-title"><i data-lucide="pie-chart"></i> Impact Breakdown</h3>
-            <div class="breakdown-grid">
-                ${Object.keys(state.answerCategories).map(cat => `
-                    <div class="breakdown-item">
-                        <div class="breakdown-label">${cat}</div>
-                        <div class="breakdown-val">${state.answerCategories[cat]} <span style="font-size:0.7em;color:var(--text-secondary)">kg CO₂</span></div>
+            <div class="breakdown-card">
+                <div class="card-title">Breakdown by Category</div>
+                <div class="breakdown-content">
+                    <div class="chart-container">
+                        <canvas id="donutChart"></canvas>
                     </div>
-                `).join('')}
+                    <div class="legend-container">
+                        ${Object.keys(cats).map((cat, i) => {
+                            const colors = ['#1e4d3a', '#2b6e54', '#e5cdb2', '#cf6641', '#a1b08b'];
+                            const color = colors[i % colors.length];
+                            const val = cats[cat];
+                            const pct = Math.round((val / totalScore) * 100);
+                            return `
+                                <div class="legend-item">
+                                    <div class="legend-label"><div class="legend-dot" style="background:${color};"></div> ${cat.charAt(0).toUpperCase() + cat.slice(1)}</div>
+                                    <div class="legend-val">${val} kg <span style="color:var(--text-muted); font-size: 0.8em;">(${pct}%)</span></div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="glass-card">
-            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
-                <i data-lucide="sparkles"></i> Personalized Recommendations
-            </h3>
-            <div class="rec-list">
-                ${generateRecommendations()}
-            </div>
-            
-            <h3 class="section-title" style="color: #3b82f6; border-bottom-color: #3b82f6; margin-top: 3rem;">
-                <i data-lucide="globe"></i> Offset Your Impact
-            </h3>
-            <div class="rec-list">
-                ${generateOffsets()}
+        <div class="wide-card">
+            <div class="card-title"><i data-lucide="globe"></i> Comparison with Global Averages</div>
+            <div class="bar-chart-container">
+                <canvas id="barChart"></canvas>
             </div>
         </div>
 
-        <div style="text-align: center; margin-top: 2rem;">
-            <button class="btn-primary" id="download-pdf-btn" style="font-size: 1.1rem; padding: 1rem 2rem; display: inline-flex; align-items: center; gap: 0.5rem;">
-                <i data-lucide="download"></i> Download Report (PDF)
-            </button>
+        <div class="ai-rec-banner">
+            <div style="display:flex; align-items:center; gap: 1rem;">
+                <i data-lucide="sparkles" style="color: var(--brand-orange)"></i>
+                <span style="font-weight: 600; font-size: 1.1rem;">AI-Powered Recommendations</span>
+            </div>
+            <button class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">Get AI Recommendations</button>
+        </div>
+
+        <div class="wide-card" style="margin-top: 2rem;">
+            <div class="card-title" style="margin-bottom: 2rem;"><i data-lucide="tree-deciduous"></i> Carbon Offset Actions</div>
+            <div class="offset-grid">
+                <div class="offset-card">
+                    <div class="offset-icon"><i data-lucide="trees"></i></div>
+                    <h4>Tree Planting</h4>
+                    <p class="desc">Each tree absorbs ~22 kg of CO2 per year. Support reforestation projects worldwide.</p>
+                    <div class="offset-footer">
+                        <span class="offset-cost">22 kg CO2/tree/year</span>
+                        <a href="#" class="offset-link" onclick="event.preventDefault()">Learn More <i data-lucide="external-link" style="width:14px;"></i></a>
+                    </div>
+                </div>
+                <div class="offset-card">
+                    <div class="offset-icon"><i data-lucide="sun"></i></div>
+                    <h4>Renewable Energy Credits</h4>
+                    <p class="desc">Purchase renewable energy certificates to support clean energy production directly displacing fossil fuels.</p>
+                    <div class="offset-footer">
+                        <span class="offset-cost">Varies by project</span>
+                        <a href="#" class="offset-link" onclick="event.preventDefault()">Learn More <i data-lucide="external-link" style="width:14px;"></i></a>
+                    </div>
+                </div>
+                <div class="offset-card">
+                    <div class="offset-icon"><i data-lucide="waves"></i></div>
+                    <h4>Ocean Conservation</h4>
+                    <p class="desc">Support ocean cleanup and conservation projects that protect marine ecosystems and carbon sinks.</p>
+                    <div class="offset-footer">
+                        <span class="offset-cost">Significant CO2 sequestration</span>
+                        <a href="#" class="offset-link" onclick="event.preventDefault()">Learn More <i data-lucide="external-link" style="width:14px;"></i></a>
+                    </div>
+                </div>
+            </div>
         </div>
     `;
 
     setTimeout(() => {
-        const downloadBtn = container.querySelector('#download-pdf-btn');
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', async () => {
-                const originalText = downloadBtn.innerHTML;
-                downloadBtn.innerHTML = 'Generating PDF...';
-                downloadBtn.disabled = true;
-                
-                try {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF('p', 'mm', 'a4');
-                    
-                    // Target each card tile natively to prevent ambient background bleed
-                    const cards = container.querySelectorAll('.glass-card');
-                    
-                    let currentY = 10; // Start 10mm from top
-                    const pdfWidth = doc.internal.pageSize.getWidth();
-                    const margin = 10;
-                    
-                    for (let i = 0; i < cards.length; i++) {
-                        const card = cards[i];
-                        
-                        // Temporarily assign a solid dark slate background to the card.
-                        // This prevents html2canvas from misinterpreting backdrop-filters
-                        // or rendering dark transparent layers across the PDF.
-                        const originalBg = card.style.background;
-                        const originalBorder = card.style.border;
-                        card.style.background = '#1a1a24';
-                        card.style.border = '1px solid #2d2d3a';
-                        
-                        const canvas = await html2canvas(card, {
-                            scale: 2,
-                            backgroundColor: '#0a0a0c',
-                            useCORS: true
-                        });
-                        
-                        // Restore original web styling
-                        card.style.background = originalBg;
-                        card.style.border = originalBorder;
-                        
-                        const imgData = canvas.toDataURL('image/png');
-                        const imgWidth = pdfWidth - (margin * 2);
-                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                        
-                        // If it exceeds the page height, create a new page natively instead of cutting it off
-                        if (currentY + imgHeight > doc.internal.pageSize.getHeight() - margin) {
-                            doc.addPage();
-                            currentY = 10;
-                        }
-                        
-                        doc.addImage(imgData, 'PNG', margin, currentY, imgWidth, imgHeight);
-                        currentY += imgHeight + 10; // Add 10mm gap between tiles
-                    }
+        // Init Charts
+        const donutCtx = document.getElementById('donutChart');
+        if (donutCtx) {
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(cats),
+                    datasets: [{
+                        data: Object.values(cats),
+                        backgroundColor: ['#1e4d3a', '#2b6e54', '#e5cdb2', '#cf6641', '#a1b08b'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    cutout: '70%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                    maintainAspectRatio: false
+                }
+            });
+        }
 
-                    doc.save('EcoTrack-Carbon-Report.pdf');
-                } catch (err) {
-                    console.error('Error generating PDF:', err);
-                    alert('Could not generate PDF.');
-                    downloadBtn.style.display = 'inline-flex';
-                } finally {
-                    downloadBtn.innerHTML = originalText;
-                    downloadBtn.disabled = false;
-                    lucide.createIcons();
+        const barCtx = document.getElementById('barChart');
+        if (barCtx) {
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['You', 'Global', 'US', 'EU', 'UK', 'China', 'India'],
+                    datasets: [{
+                        label: 'Tons of CO2 / Year',
+                        data: [tons, 4.7, 14.9, 6.2, 5.2, 8.0, 1.9],
+                        backgroundColor: [
+                            '#cf6641', // You (Orange highlight)
+                            '#a1b08b', '#a1b08b', '#a1b08b', '#a1b08b', '#a1b08b', '#a1b08b' // Others slightly faded green
+                        ],
+                        borderRadius: 4,
+                        barPercentage: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 24,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            border: { display: false }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            border: { display: false }
+                        }
+                    }
                 }
             });
         }
@@ -548,356 +836,31 @@ function createResultsView() {
 }
 
 // ==========================================================================
-// Helpers
+// Authentication
 // ==========================================================================
 
-function getScoreMessage(scoreClass) {
-    if (scoreClass === 'low') return "Great job! Your footprint is lower than average. Keep prioritizing sustainable choices.";
-    if (scoreClass === 'medium') return "You are around the average. There's definite room for improvement in key areas.";
-    return "Your footprint is significantly higher than average. Small lifestyle changes can make a massive difference.";
-}
-
-function generateRecommendations() {
-    let recsHTML = '';
-    const cats = state.answerCategories;
-
-    if (cats.transportation > 1000) {
-        recsHTML += `
-            <div class="rec-card">
-                <div class="rec-icon"><i data-lucide="bus"></i></div>
-                <div class="rec-content">
-                    <h4>Switch Up Your Commute</h4>
-                    <p>Your transport emissions are high. Try carpooling, e-biking, or taking public transit just 2 days a week to cut your commute emissions by 40%.</p>
-                </div>
-            </div>`;
-    }
-
-    if (cats.diet > 1500) {
-        recsHTML += `
-            <div class="rec-card">
-                <div class="rec-icon"><i data-lucide="utensils-crossed"></i></div>
-                <div class="rec-content">
-                    <h4>Meatless Mondays</h4>
-                    <p>A meat-heavy diet has a major impact. Replacing meat with plant-based alternatives a few times a week saves thousands of liters of water and cuts methane emissions.</p>
-                </div>
-            </div>`;
-    }
-
-    if (cats.energy > 1500) {
-        recsHTML += `
-            <div class="rec-card">
-                <div class="rec-icon"><i data-lucide="lightbulb-off"></i></div>
-                <div class="rec-content">
-                    <h4>Home Energy Audit</h4>
-                    <p>Switch to LED lighting, unplug phantom load devices, and consider checking your utility provider for a 'Green Energy' plan.</p>
-                </div>
-            </div>`;
-    }
-
-    if (cats.travel > 2000) {
-        recsHTML += `
-            <div class="rec-card">
-                <div class="rec-icon"><i data-lucide="train"></i></div>
-                <div class="rec-content">
-                    <h4>Alternative Travel</h4>
-                    <p>Frequent flights drive up footprints fast. For shorter trips, opt for trains. If you must fly, explore direct flights which are more fuel efficient.</p>
-                </div>
-            </div>`;
-    }
-
-    // Generic recommendation if score is somehow super low across the board
-    if (recsHTML === '') {
-        recsHTML += `
-            <div class="rec-card">
-                <div class="rec-icon"><i data-lucide="heart"></i></div>
-                <div class="rec-content">
-                    <h4>Advocate Mentorship</h4>
-                    <p>You are already doing fantastic. Consider joining local community boards to advocate for better public transit or community solar projects.</p>
-                </div>
-            </div>`;
-    }
-
-    return recsHTML;
-}
-
-function generateOffsets() {
-    return `
-        <div class="rec-card offset">
-            <div class="rec-icon"><i data-lucide="tree-deciduous"></i></div>
-            <div class="rec-content">
-                <h4>Support Reforestation</h4>
-                <p>Invest in verified tree planting initiatives like <strong>One Tree Planted</strong> or <strong>Eden Reforestation Projects</strong>. These projects restore ecosystems and capture carbon long-term.</p>
-                <a href="#" class="action-link" onclick="event.preventDefault();">Explore Projects <i data-lucide="arrow-right" style="width:16px;"></i></a>
-            </div>
-        </div>
-        <div class="rec-card offset">
-            <div class="rec-icon"><i data-lucide="wind"></i></div>
-            <div class="rec-content">
-                <h4>Renewable Infrastructure</h4>
-                <p>Help fund solar and wind projects in developing nations through organizations like <strong>Gold Standard</strong> or <strong>Terrapass</strong>, displacing fossil-fuel dependence.</p>
-                <a href="#" class="action-link" onclick="event.preventDefault();">Learn More <i data-lucide="arrow-right" style="width:16px;"></i></a>
-            </div>
-        </div>
-    `;
-}
-
-function createDashboardView() {
-    const container = document.createElement('div');
-    container.className = 'dashboard-view';
-
-    container.innerHTML = `
-        <div class="dashboard-header">
-            <h2>Welcome back, ${state.user ? state.user.name : 'User'}!</h2>
-            <p style="color: var(--text-secondary);">Here is your personal EcoTrack dashboard.</p>
-        </div>
-        
-        <div class="dashboard-grid">
-            <div class="dash-card" id="dash-solutions-btn" style="cursor: pointer; border-color: var(--border-hover); background: rgba(59, 130, 246, 0.05);">
-                <i data-lucide="lightbulb" class="dash-icon" style="color: #3b82f6;"></i>
-                <h3 style="color: #3b82f6;">SOLUTIONS</h3>
-                <p>Discover personalized strategies and technologies designed to minimize your environmental footprint.</p>
-            </div>
-            <div class="dash-card">
-                <i data-lucide="layers" class="dash-icon"></i>
-                <h3>OUR PLATFORMS</h3>
-                <p>Explore tools and services integrated within EcoTrack for seamless tracking.</p>
-            </div>
-            <div class="dash-card" id="dash-calc-btn" style="cursor: pointer; border-color: var(--border-hover); background: rgba(16, 185, 129, 0.05);">
-                <i data-lucide="calculator" class="dash-icon" style="color: var(--accent-primary);"></i>
-                <h3 style="color: var(--accent-primary);">CALCULATORS</h3>
-                <p>Use our advanced footprint and emissions calculators to assess your impact.</p>
-            </div>
-            <div class="dash-card">
-                <i data-lucide="info" class="dash-icon"></i>
-                <h3>INFORMATION</h3>
-                <p>Read articles, research, and data regarding extreme climate shifts and sustainability.</p>
-            </div>
-            <div class="dash-card" id="dash-about-btn" style="cursor: pointer; border-color: var(--border-hover); background: rgba(16, 185, 129, 0.05);">
-                <i data-lucide="users" class="dash-icon" style="color: var(--accent-primary);"></i>
-                <h3 style="color: var(--accent-primary);">ABOUT US</h3>
-                <p>Learn more about our mission, vision, and the team driving EcoTrack forward.</p>
-            </div>
-        </div>
-    `;
-
-    setTimeout(() => {
-        container.querySelector('#dash-calc-btn').addEventListener('click', () => {
-            resetState();
-            window.location.hash = '#questionnaire';
-        });
-        const solBtn = container.querySelector('#dash-solutions-btn');
-        if (solBtn) {
-            solBtn.addEventListener('click', () => {
-                window.location.hash = '#solutions';
-            });
-        }
-        const aboutBtn = container.querySelector('#dash-about-btn');
-        if (aboutBtn) {
-            aboutBtn.addEventListener('click', () => {
-                window.location.hash = '#about-us';
-            });
-        }
-    }, 0);
-
-    return container;
-}
-
-function createAboutUsView() {
-    const container = document.createElement('div');
-    container.className = 'about-us-view';
-    // inline styles just for padding and width, similar to dashboard-view
-    container.style = "width: 100%; max-width: 900px; margin: 2rem auto; padding: 0 1rem; animation: fadeIn 0.4s ease-out;";
-
-    container.innerHTML = `
-        <div class="dashboard-header">
-            <h2><i data-lucide="globe" style="width: 36px; height: 36px; vertical-align: text-bottom; color: var(--accent-primary); margin-right: 0.5rem;"></i>About Us</h2>
-            <p style="color: var(--text-secondary);">Personal Carbon Footprint Assessment & Reduction Assistant 🌱💡</p>
-        </div>
-        
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <p style="color: var(--text-primary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 1rem;">
-                Welcome to our smart web-based platform designed to help individuals <strong>understand, measure, and reduce</strong> their environmental impact.
-            </p>
-            <p style="color: var(--text-secondary); line-height: 1.6;">
-                Our website calculates carbon emissions generated from daily activities such as 🚗 <strong>transportation</strong>, ⚡ <strong>energy consumption</strong>, 🥗 <strong>diet</strong>, 🛒 <strong>shopping</strong>, and ✈️ <strong>travel</strong>. With just a few inputs, users can discover how their lifestyle affects the planet <i data-lucide="globe" style="width: 16px; height: 16px; vertical-align: middle;"></i>.
-            </p>
-        </div>
-
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
-                🎯 Our Mission
-            </h3>
-            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
-                Our goal is simple yet powerful — to <strong>raise awareness about climate change</strong> 🌡️ and inspire people to adopt <strong>eco-friendly and sustainable habits</strong> ♻️.
-            </p>
-            <p style="color: var(--text-secondary); line-height: 1.6;">
-                By providing <strong>accurate carbon estimates</strong> 📊 along with <strong>personalized suggestions</strong> 💡, we aim to guide users toward a <strong>greener, cleaner, and healthier future</strong> 🌿✨.
-            </p>
-        </div>
-
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
-                ⚙️ How It Works
-            </h3>
-            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem; list-style-type: none;">
-                <li style="margin-bottom: 0.5rem;">🔹 Users enter their daily activity data</li>
-                <li style="margin-bottom: 0.5rem;">🔹 The system calculates their <strong>carbon footprint (kg CO₂)</strong></li>
-                <li style="margin-bottom: 1rem;">🔹 Smart suggestions are provided to <strong>reduce emissions</strong></li>
-            </ul>
-            <p style="color: var(--accent-primary); font-style: italic; text-align: center; margin-top: 1rem;">
-                👉 Measure ➝ Understand ➝ Improve 🌸
-            </p>
-        </div>
-
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
-                👨‍💻 Our Team
-            </h3>
-            <p style="color: var(--text-secondary); line-height: 1.6;">
-                This project is developed by <strong>B.Tech (AI & ML) students</strong> 🎓 of <strong>Arka Jain University</strong> as part of an academic initiative focused on <strong>environmental sustainability <i data-lucide="globe" style="width: 16px; height: 16px; vertical-align: middle;"></i></strong> and <strong>innovation 💻</strong>.
-            </p>
-        </div>
-
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
-                🌱 Our Belief
-            </h3>
-            <p style="color: var(--text-secondary); line-height: 1.6;">
-                We believe that <strong>small individual actions</strong> 🌼, when combined, can create <strong>big positive changes</strong> for our planet <i data-lucide="globe" style="width: 16px; height: 16px; vertical-align: middle;"></i> 💚.
-            </p>
-        </div>
-
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
-                🔮 Future Vision
-            </h3>
-            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
-                In the future, we plan to enhance this platform with:
-            </p>
-            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem; list-style-type: none;">
-                <li>✨ Real-time data tracking 📡</li>
-                <li>📱 Mobile application integration</li>
-                <li>🤖 AI-based smart recommendations</li>
-            </ul>
-            <p style="color: var(--text-secondary); line-height: 1.6; margin-top: 1rem;">
-                to make the system more <strong>intelligent, efficient, and user-friendly</strong> 🚀.
-            </p>
-        </div>
-        
-        <p style="color: var(--accent-primary); font-size: 1.2rem; font-style: italic; text-align: center; margin: 3rem 0; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-            🌿 Together, let’s build a sustainable future! <i data-lucide="globe" style="width: 20px; height: 20px;"></i> 💚
-        </p>
-
-        <div style="text-align: center; margin-top: 2rem;">
-            <button class="btn-outline" id="back-to-dashboard-btn" style="padding: 0.8rem 1.5rem;">
-                <i data-lucide="arrow-left"></i> Back to Dashboard
-            </button>
-        </div>
-    `;
-
-    setTimeout(() => {
-        container.querySelector('#back-to-dashboard-btn').addEventListener('click', () => {
-            window.location.hash = '#dashboard';
-        });
-    }, 0);
-
-    return container;
-}
-
-function createSolutionsView() {
-    const container = document.createElement('div');
-    container.className = 'solutions-view';
-    // inline styles just for padding and width, similar to dashboard-view
-    container.style = "width: 100%; max-width: 1200px; margin: 2rem auto; padding: 0 1rem; animation: fadeIn 0.4s ease-out;";
-
-    container.innerHTML = `
-        <div class="dashboard-header">
-            <h2>UN Global Climate Solutions</h2>
-            <p style="color: var(--text-secondary);">Core pillars and strategies based on the United Nations Framework</p>
-        </div>
-        
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
-                <i data-lucide="scissors"></i> 1. Cutting Emissions (Mitigation)
-            </h3>
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                Focuses on stopping the rise of greenhouse gases and limiting global temperature increase to 1.5°C.
-            </p>
-            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem;">
-                <li style="margin-bottom: 0.5rem;"><strong>Net Zero:</strong> Reaching a balance between greenhouse gases emitted and those removed from the atmosphere. This requires a 45% reduction in emissions by 2030 and net zero by 2050.</li>
-                <li><strong>Scientific Urgency:</strong> Utilizing real-time scientific indicators to drive rapid decarbonization across all sectors, including transport, industry, and agriculture.</li>
-            </ul>
-        </div>
-
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
-                <i data-lucide="zap"></i> 2. Clean Energy Transition
-            </h3>
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                A massive shift from fossil fuels to renewable sources is the primary solution for a safer future.
-            </p>
-            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem;">
-                <li style="margin-bottom: 0.5rem;"><strong>Renewable Energy:</strong> Scaling up solar, wind, hydropower, and geothermal energy, which are now cheaper and more sustainable than coal and oil.</li>
-                <li style="margin-bottom: 0.5rem;"><strong>Phase Out Coal & Subsidies:</strong> Ending the construction of new coal plants, phasing out existing ones, and redirecting trillions in fossil fuel subsidies to renewables.</li>
-                <li><strong>Nature Restoration:</strong> Protecting forests and oceans as natural carbon sinks.</li>
-            </ul>
-        </div>
-
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
-                <i data-lucide="shield-alert"></i> 3. Adapting to Climate Change (Resilience)
-            </h3>
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                Since some climate impacts are already unavoidable, countries must build resilience to survive increasingly extreme weather.
-            </p>
-            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem;">
-                <li style="margin-bottom: 0.5rem;"><strong>Infrastructure Resilience:</strong> Building flood defenses, restoring mangroves, and developing drought-resistant crops.</li>
-                <li><strong>Early Warnings for All:</strong> A UN initiative striving to protect every person on Earth with early warning systems by 2027 to save lives during disasters.</li>
-            </ul>
-        </div>
-
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
-                <i data-lucide="landmark"></i> 4. Financing Climate Action
-            </h3>
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                Finance is the "great enabler" that allows developing nations to bypass fossil-fuel-led growth.
-            </p>
-            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem;">
-                <li style="margin-bottom: 0.5rem;"><strong>Scaling Investment:</strong> Moving from billions to trillions in investments for both mitigation and adaptation.</li>
-                <li><strong>Loss and Damage:</strong> Providing financial support to vulnerable nations already suffering from severe impacts.</li>
-            </ul>
-        </div>
-        
-        <div style="text-align: center; margin-top: 2rem;">
-            <button class="btn-outline" id="back-to-dashboard-btn" style="padding: 0.8rem 1.5rem;">
-                <i data-lucide="arrow-left"></i> Back to Dashboard
-            </button>
-        </div>
-    `;
-
-    setTimeout(() => {
-        container.querySelector('#back-to-dashboard-btn').addEventListener('click', () => {
-            window.location.hash = '#dashboard';
-        });
-    }, 0);
-
-    return container;
-}
-
 function updateAuthUI() {
-    // Keep Dashboard nav button permanently visible
-    if (DOM.dashboardBtn) {
-        DOM.dashboardBtn.style.display = 'block';
-    }
-
+    const signinBtn = document.getElementById('signin-nav-btn');
+    const userProfile = document.getElementById('user-profile');
+    
     if (state.user) {
-        DOM.signinBtn.style.display = 'none';
-        DOM.userProfile.style.display = 'flex';
-        DOM.userAvatar.textContent = state.user.name ? state.user.name.charAt(0).toUpperCase() : 'U';
+        if (signinBtn) signinBtn.style.display = 'none';
+        if (userProfile) {
+            userProfile.style.display = 'flex';
+            const nameSpan = userProfile.querySelector('span');
+            const navPic = userProfile.querySelector('#nav-profile-pic');
+            if (nameSpan) nameSpan.textContent = state.user.name || 'User Profile';
+            if (navPic) {
+                if (state.user.avatar) {
+                    navPic.src = state.user.avatar;
+                } else {
+                    navPic.src = 'https://ui-avatars.com/api/?name=' + (state.user.name || 'User') + '&background=0f3d2b&color=fff';
+                }
+            }
+        }
     } else {
-        DOM.signinBtn.style.display = 'block';
-        DOM.userProfile.style.display = 'none';
+        if (signinBtn) signinBtn.style.display = 'flex';
+        if (userProfile) userProfile.style.display = 'none';
     }
 }
 
@@ -908,104 +871,91 @@ function openAuthModal() {
         overlay.className = 'auth-modal-overlay';
         overlay.id = 'auth-modal';
         overlay.innerHTML = `
-            <div class="glass-card auth-modal-card">
-                <button class="close-modal-btn" id="close-auth"><i data-lucide="x"></i></button>
-                <div class="auth-header" style="text-align: center; margin-bottom: 2rem;">
-                    <h2 id="auth-title">Welcome to EcoTrack</h2>
-                    <p style="color: var(--text-secondary); margin-top: 0.5rem;" id="auth-subtitle">Sign in to continue</p>
+            <div class="auth-modal-card">
+                <button class="close-modal-btn"><i data-lucide="x" style="width:18px;"></i></button>
+                <div style="text-align:center; margin-bottom: 2rem;">
+                    <i data-lucide="leaf" style="color:var(--accent-primary); width:32px; height:32px; margin-bottom:1rem;"></i>
+                    <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Welcome to EcoTrack</h2>
+                    <p style="color:var(--text-secondary); font-size: 0.95rem;">Log in to calculate and save your carbon footprint.</p>
                 </div>
                 
-                <div class="auth-providers">
-                    <button class="btn-provider google-provider" id="google-login-btn">
-                        <img src="https:&#x2F;&#x2F;www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" height="20">
+                <div id="auth-buttons-container" style="display:flex; flex-direction:column; gap:0.8rem; margin-bottom: 2rem;">
+                    <button class="btn-provider" id="mock-login-google">
+                        <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                         Continue with Google
                     </button>
-                </div>
-                
-                <div class="auth-divider">
-                    <span>or sign in with email</span>
-                </div>
-                
-                <form id="auth-form" class="auth-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <div class="input-with-icon">
-                            <i data-lucide="mail"></i>
-                            <input type="email" id="auth-email" class="manual-input" style="padding-left: 3.5rem;" placeholder="you@example.com" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <div class="input-with-icon">
-                            <i data-lucide="lock"></i>
-                            <input type="password" id="auth-password" class="manual-input" style="padding-left: 3.5rem;" placeholder="••••••••" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.8rem; font-size: 1.05rem;" id="auth-submit-btn">
-                        Sign In
+                    <button class="btn-provider" id="mock-login-email">
+                        <i data-lucide="mail" style="width:20px;"></i>
+                        Continue with Email
                     </button>
+                </div>
+                
+                <form id="email-login-form" style="display:none; flex-direction:column; gap:1rem; margin-bottom: 2rem;">
+                    <div style="text-align: left;">
+                        <label style="font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 0.3rem; display: block;">Email Address</label>
+                        <input type="email" required style="width:100%; padding:0.75rem 1rem; border:1px solid var(--border-subtle); border-radius:var(--radius-sm); font-family:var(--font-body); font-size:1rem; outline:none;" placeholder="you@example.com">
+                    </div>
+                    <div style="text-align: left;">
+                        <label style="font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 0.3rem; display: block;">Password</label>
+                        <input type="password" required style="width:100%; padding:0.75rem 1rem; border:1px solid var(--border-subtle); border-radius:var(--radius-sm); font-family:var(--font-body); font-size:1rem; outline:none;" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-primary" style="justify-content:center; margin-top:0.5rem; width:100%;">Sign In</button>
+                    <button type="button" id="back-to-providers" class="btn-outline" style="justify-content:center; width:100%; border:none;">Back to all options</button>
                 </form>
                 
-                <p class="auth-footer" style="text-align: center; margin-top: 2rem; color: var(--text-secondary); font-size: 0.9rem;">
-                    Don't have an account? <a href="#" id="toggle-auth-mode" style="color: var(--accent-primary); text-decoration: none; font-weight: 500;">Sign Up</a>
+                <p style="text-align:center; font-size: 0.8rem; color:var(--text-muted);">
+                    By signing in, you agree to our Terms of Service and Privacy Policy.
                 </p>
             </div>
         `;
         document.body.appendChild(overlay);
         lucide.createIcons();
 
-        // Listeners for Modal
-        overlay.querySelector('#close-auth').addEventListener('click', closeAuthModal);
+        // Reveal transition
+        requestAnimationFrame(() => {
+            overlay.style.opacity = '1';
+        });
+
+        // Close logic
+        const closeModal = () => {
+            overlay.style.opacity = '0';
+            setTimeout(() => { if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 300);
+        };
+        overlay.querySelector('.close-modal-btn').addEventListener('click', closeModal);
         overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) closeAuthModal();
+            if (e.target === overlay) closeModal();
         });
 
-        const form = overlay.querySelector('#auth-form');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = overlay.querySelector('#auth-email').value;
-            // Mock Login Process
-            state.user = { email: email, name: email.split('@')[0] };
+        // Toggle forms logic
+        const emailBtn = overlay.querySelector('#mock-login-email');
+        const backBtn = overlay.querySelector('#back-to-providers');
+        const buttonsContainer = overlay.querySelector('#auth-buttons-container');
+        const emailForm = overlay.querySelector('#email-login-form');
+
+        emailBtn.addEventListener('click', () => {
+            buttonsContainer.style.display = 'none';
+            emailForm.style.display = 'flex';
+        });
+
+        backBtn.addEventListener('click', () => {
+            emailForm.style.display = 'none';
+            buttonsContainer.style.display = 'flex';
+        });
+
+        // Mock Login Logic
+        const handleLogin = (e) => {
+            if (e) e.preventDefault();
+            state.user = { name: "Anubhav Shreshtha" };
             updateAuthUI();
-            closeAuthModal();
-        });
+            closeModal();
+            resetState();
+            window.location.hash = '#questionnaire';
+        };
 
-        overlay.querySelector('#google-login-btn').addEventListener('click', () => {
-            // Mock Google Login
-            state.user = { email: 'user@gmail.com', name: 'Google User' };
-            updateAuthUI();
-            closeAuthModal();
-        });
-
-        let isSignUp = false;
-        overlay.querySelector('#toggle-auth-mode').addEventListener('click', function toggleMode(e) {
-            e.preventDefault();
-            isSignUp = !isSignUp;
-            const title = overlay.querySelector('#auth-title');
-            const submitBtn = document.getElementById('auth-submit-btn');
-            const toggleText = overlay.querySelector('.auth-footer');
-            if (isSignUp) {
-                title.textContent = 'Create an Account';
-                submitBtn.textContent = 'Sign Up';
-                toggleText.innerHTML = 'Already have an account? <a href="#" id="toggle-auth-mode-inner" style="color: var(--accent-primary); text-decoration: none; font-weight: 500;">Sign In</a>';
-            } else {
-                title.textContent = 'Welcome to EcoTrack';
-                submitBtn.textContent = 'Sign In';
-                toggleText.innerHTML = "Don't have an account? <a href=\"#\" id=\"toggle-auth-mode-inner\" style=\"color: var(--accent-primary); text-decoration: none; font-weight: 500;\">Sign Up</a>";
-            }
-            // re-attach listener
-            overlay.querySelector('#toggle-auth-mode-inner').addEventListener('click', toggleMode);
-        });
-    }
-    overlay.style.display = 'flex';
-}
-
-function closeAuthModal() {
-    const overlay = document.getElementById('auth-modal');
-    if (overlay) {
-        overlay.style.display = 'none';
+        overlay.querySelector('#mock-login-google').addEventListener('click', handleLogin);
+        emailForm.addEventListener('submit', handleLogin);
     }
 }
 
-// Boot application
+// Call init initially
 init();
