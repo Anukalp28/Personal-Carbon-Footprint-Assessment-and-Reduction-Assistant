@@ -60,33 +60,27 @@
         <main id="main-content">
             <!-- Content injected via JS -->
         </main>
-    </div>
 
-    <!-- Chatbot Drawer -->
-    <div id="ai-chat-drawer" class="chat-drawer">
-        <div class="chat-header">
-            <div style="display:flex; align-items:center; gap:0.8rem;">
-                <div style="background: var(--accent-light); padding: 0.5rem; border-radius: 50%;">
-                    <i data-lucide="bot" style="color:var(--accent-primary); width:20px; height:20px;"></i>
+        <!-- AI Chatbot Drawer -->
+        <div id="chat-drawer" class="chat-drawer">
+            <div class="chat-header">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <i data-lucide="bot" style="width: 20px; color: var(--accent-primary);"></i>
+                    <strong style="font-size: 1rem; color: var(--text-primary);">EcoBot Assistant</strong>
                 </div>
-                <div style="display:flex; flex-direction:column;">
-                    <span style="font-weight:600; font-size:1rem; color:var(--text-primary);">Eco-Assistant</span>
-                    <span style="font-size:0.75rem; color:var(--accent-primary); font-weight:600;">✨ AI Online</span>
+                <button class="icon-btn" id="close-chat-btn" style="padding:0;"><i data-lucide="x" style="width: 18px;"></i></button>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="chat-msg bot-msg">
+                    <p>Hello! 🌱 I am your simulated AI Eco-Assistant. I analyze your carbon footprint data to provide personalized recommendations. What would you like to explore today?</p>
                 </div>
             </div>
-            <button class="icon-btn" id="close-chat-btn" style="color:var(--text-muted);"><i data-lucide="x" style="width:20px;"></i></button>
-        </div>
-        
-        <div class="chat-messages" id="chat-messages">
-            <div class="chat-msg ai-msg">
-                Hello! I am your personal AI Eco-Assistant. I can process your carbon tracking logs and give you tailored advice. How can I help you today?
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Ask about reducing your footprint..." autocomplete="off">
+                <button id="send-chat-btn"><i data-lucide="send" style="width: 18px;"></i></button>
             </div>
         </div>
 
-        <form class="chat-input-area" id="chat-form">
-            <input type="text" id="chat-input" placeholder="Ask for recommendations..." autocomplete="off" required>
-            <button type="submit" id="send-chat-btn" class="send-btn"><i data-lucide="send" style="width:18px;"></i></button>
-        </form>
     </div>
 
     <!-- Scripts -->
