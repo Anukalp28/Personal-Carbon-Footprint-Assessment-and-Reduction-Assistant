@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoTrack | Carbon Footprint Assessment</title>
-    <meta name="description" content="Calculate your carbon footprint, explore personalized recommendations, and discover ways to reduce your environmental impact.">
+    <meta name="description"
+        content="Calculate your carbon footprint, explore personalized recommendations, and discover ways to reduce your environmental impact.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
     <!-- Icons (Lucide via CDN) -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div id="app">
         <!-- Main Navigation -->
@@ -22,11 +30,18 @@
                 <span>EcoTrack</span>
             </div>
             <div class="nav-right" style="display: flex; gap: 1rem; align-items: center;">
+                <button class="nav-button" id="dashboard-nav-btn">Dashboard</button>
                 <button class="nav-button" id="start-nav-btn">Start Assessment</button>
-                <button class="btn-outline" id="signin-nav-btn" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">Sign In</button>
-                <div id="user-profile" style="display: none; align-items: center; gap: 0.5rem; color: var(--text-primary);">
-                    <div class="user-avatar" id="user-avatar-icon" style="width: 35px; height: 35px; background: var(--accent-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #fff;">U</div>
-                    <button class="nav-button" id="signout-nav-btn" style="padding: 0.5rem 1.25rem; font-size: 0.9rem; background: transparent; border-color: transparent;">Sign Out</button>
+                <button class="btn-outline" id="signin-nav-btn" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">Sign
+                    In</button>
+                <div id="user-profile"
+                    style="display: none; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+                    <div class="user-avatar" id="user-avatar-icon"
+                        style="width: 35px; height: 35px; background: var(--accent-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #fff;">
+                        U</div>
+                    <button class="nav-button" id="signout-nav-btn"
+                        style="padding: 0.5rem 1.25rem; font-size: 0.9rem; background: transparent; border-color: transparent;">Sign
+                        Out</button>
                 </div>
             </div>
         </nav>
@@ -40,4 +55,5 @@
     <!-- Scripts -->
     <script src="app.js"></script>
 </body>
+
 </html>

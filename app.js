@@ -77,6 +77,7 @@ const questions = [
 const DOM = {
     main: document.getElementById('main-content'),
     navBtn: document.getElementById('start-nav-btn'),
+    dashboardBtn: document.getElementById('dashboard-nav-btn'),
     logo: document.querySelector('.logo'),
     signinBtn: document.getElementById('signin-nav-btn'),
     signoutBtn: document.getElementById('signout-nav-btn'),
@@ -104,6 +105,12 @@ function setupGlobalListeners() {
         window.location.hash = '#landing';
     });
 
+    if (DOM.dashboardBtn) {
+        DOM.dashboardBtn.addEventListener('click', () => {
+            window.location.hash = '#dashboard';
+        });
+    }
+
     if (DOM.signinBtn) {
         DOM.signinBtn.addEventListener('click', openAuthModal);
     }
@@ -120,7 +127,7 @@ function handleRoute() {
     const hash = window.location.hash.slice(1) || 'landing';
 
     // Only allow valid views
-    if (['landing', 'questionnaire', 'results', 'manual-entry'].includes(hash)) {
+    if (['landing', 'questionnaire', 'results', 'manual-entry', 'dashboard', 'solutions'].includes(hash)) {
         state.currentView = hash;
     } else {
         state.currentView = 'landing';
@@ -140,7 +147,7 @@ function renderView() {
     DOM.main.innerHTML = ''; // Clear current content
 
     // Update Nav Button based on context
-    if (state.currentView === 'landing' || state.currentView === 'results') {
+    if (state.currentView === 'landing' || state.currentView === 'results' || state.currentView === 'dashboard' || state.currentView === 'solutions') {
         DOM.navBtn.style.display = 'block';
         DOM.navBtn.textContent = 'Start Assessment';
     } else {
@@ -150,6 +157,12 @@ function renderView() {
     switch (state.currentView) {
         case 'landing':
             DOM.main.appendChild(createLandingView());
+            break;
+        case 'dashboard':
+            DOM.main.appendChild(createDashboardView());
+            break;
+        case 'solutions':
+            DOM.main.appendChild(createSolutionsView());
             break;
         case 'questionnaire':
             DOM.main.appendChild(createQuestionnaireView());
@@ -452,7 +465,81 @@ function createResultsView() {
                 ${generateOffsets()}
             </div>
         </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn-primary" id="download-pdf-btn" style="font-size: 1.1rem; padding: 1rem 2rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="download"></i> Download Report (PDF)
+            </button>
+        </div>
     `;
+
+    setTimeout(() => {
+        const downloadBtn = container.querySelector('#download-pdf-btn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', async () => {
+                const originalText = downloadBtn.innerHTML;
+                downloadBtn.innerHTML = 'Generating PDF...';
+                downloadBtn.disabled = true;
+                
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('p', 'mm', 'a4');
+                    
+                    // Target each card tile natively to prevent ambient background bleed
+                    const cards = container.querySelectorAll('.glass-card');
+                    
+                    let currentY = 10; // Start 10mm from top
+                    const pdfWidth = doc.internal.pageSize.getWidth();
+                    const margin = 10;
+                    
+                    for (let i = 0; i < cards.length; i++) {
+                        const card = cards[i];
+                        
+                        // Temporarily assign a solid dark slate background to the card.
+                        // This prevents html2canvas from misinterpreting backdrop-filters
+                        // or rendering dark transparent layers across the PDF.
+                        const originalBg = card.style.background;
+                        const originalBorder = card.style.border;
+                        card.style.background = '#1a1a24';
+                        card.style.border = '1px solid #2d2d3a';
+                        
+                        const canvas = await html2canvas(card, {
+                            scale: 2,
+                            backgroundColor: '#0a0a0c',
+                            useCORS: true
+                        });
+                        
+                        // Restore original web styling
+                        card.style.background = originalBg;
+                        card.style.border = originalBorder;
+                        
+                        const imgData = canvas.toDataURL('image/png');
+                        const imgWidth = pdfWidth - (margin * 2);
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                        
+                        // If it exceeds the page height, create a new page natively instead of cutting it off
+                        if (currentY + imgHeight > doc.internal.pageSize.getHeight() - margin) {
+                            doc.addPage();
+                            currentY = 10;
+                        }
+                        
+                        doc.addImage(imgData, 'PNG', margin, currentY, imgWidth, imgHeight);
+                        currentY += imgHeight + 10; // Add 10mm gap between tiles
+                    }
+
+                    doc.save('EcoTrack-Carbon-Report.pdf');
+                } catch (err) {
+                    console.error('Error generating PDF:', err);
+                    alert('Could not generate PDF.');
+                    downloadBtn.style.display = 'inline-flex';
+                } finally {
+                    downloadBtn.innerHTML = originalText;
+                    downloadBtn.disabled = false;
+                    lucide.createIcons();
+                }
+            });
+        }
+    }, 0);
 
     return container;
 }
@@ -551,7 +638,148 @@ function generateOffsets() {
     `;
 }
 
+function createDashboardView() {
+    const container = document.createElement('div');
+    container.className = 'dashboard-view';
+
+    container.innerHTML = `
+        <div class="dashboard-header">
+            <h2>Welcome back, ${state.user ? state.user.name : 'User'}!</h2>
+            <p style="color: var(--text-secondary);">Here is your personal EcoTrack dashboard.</p>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="dash-card" id="dash-solutions-btn" style="cursor: pointer; border-color: var(--border-hover); background: rgba(59, 130, 246, 0.05);">
+                <i data-lucide="lightbulb" class="dash-icon" style="color: #3b82f6;"></i>
+                <h3 style="color: #3b82f6;">SOLUTIONS</h3>
+                <p>Discover personalized strategies and technologies designed to minimize your environmental footprint.</p>
+            </div>
+            <div class="dash-card">
+                <i data-lucide="layers" class="dash-icon"></i>
+                <h3>OUR PLATFORMS</h3>
+                <p>Explore tools and services integrated within EcoTrack for seamless tracking.</p>
+            </div>
+            <div class="dash-card" id="dash-calc-btn" style="cursor: pointer; border-color: var(--border-hover); background: rgba(16, 185, 129, 0.05);">
+                <i data-lucide="calculator" class="dash-icon" style="color: var(--accent-primary);"></i>
+                <h3 style="color: var(--accent-primary);">CALCULATORS</h3>
+                <p>Use our advanced footprint and emissions calculators to assess your impact.</p>
+            </div>
+            <div class="dash-card">
+                <i data-lucide="info" class="dash-icon"></i>
+                <h3>INFORMATION</h3>
+                <p>Read articles, research, and data regarding extreme climate shifts and sustainability.</p>
+            </div>
+            <div class="dash-card">
+                <i data-lucide="users" class="dash-icon"></i>
+                <h3>ABOUT US</h3>
+                <p>Learn more about our mission, vision, and the team driving EcoTrack forward.</p>
+            </div>
+        </div>
+    `;
+
+    setTimeout(() => {
+        container.querySelector('#dash-calc-btn').addEventListener('click', () => {
+            resetState();
+            window.location.hash = '#questionnaire';
+        });
+        const solBtn = container.querySelector('#dash-solutions-btn');
+        if (solBtn) {
+            solBtn.addEventListener('click', () => {
+                window.location.hash = '#solutions';
+            });
+        }
+    }, 0);
+
+    return container;
+}
+
+function createSolutionsView() {
+    const container = document.createElement('div');
+    container.className = 'solutions-view';
+    // inline styles just for padding and width, similar to dashboard-view
+    container.style = "width: 100%; max-width: 1200px; margin: 2rem auto; padding: 0 1rem; animation: fadeIn 0.4s ease-out;";
+
+    container.innerHTML = `
+        <div class="dashboard-header">
+            <h2>UN Global Climate Solutions</h2>
+            <p style="color: var(--text-secondary);">Core pillars and strategies based on the United Nations Framework</p>
+        </div>
+        
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
+                <i data-lucide="scissors"></i> 1. Cutting Emissions (Mitigation)
+            </h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Focuses on stopping the rise of greenhouse gases and limiting global temperature increase to 1.5°C.
+            </p>
+            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem;">
+                <li style="margin-bottom: 0.5rem;"><strong>Net Zero:</strong> Reaching a balance between greenhouse gases emitted and those removed from the atmosphere. This requires a 45% reduction in emissions by 2030 and net zero by 2050.</li>
+                <li><strong>Scientific Urgency:</strong> Utilizing real-time scientific indicators to drive rapid decarbonization across all sectors, including transport, industry, and agriculture.</li>
+            </ul>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
+                <i data-lucide="zap"></i> 2. Clean Energy Transition
+            </h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                A massive shift from fossil fuels to renewable sources is the primary solution for a safer future.
+            </p>
+            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem;">
+                <li style="margin-bottom: 0.5rem;"><strong>Renewable Energy:</strong> Scaling up solar, wind, hydropower, and geothermal energy, which are now cheaper and more sustainable than coal and oil.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Phase Out Coal & Subsidies:</strong> Ending the construction of new coal plants, phasing out existing ones, and redirecting trillions in fossil fuel subsidies to renewables.</li>
+                <li><strong>Nature Restoration:</strong> Protecting forests and oceans as natural carbon sinks.</li>
+            </ul>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
+                <i data-lucide="shield-alert"></i> 3. Adapting to Climate Change (Resilience)
+            </h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Since some climate impacts are already unavoidable, countries must build resilience to survive increasingly extreme weather.
+            </p>
+            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem;">
+                <li style="margin-bottom: 0.5rem;"><strong>Infrastructure Resilience:</strong> Building flood defenses, restoring mangroves, and developing drought-resistant crops.</li>
+                <li><strong>Early Warnings for All:</strong> A UN initiative striving to protect every person on Earth with early warning systems by 2027 to save lives during disasters.</li>
+            </ul>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
+                <i data-lucide="landmark"></i> 4. Financing Climate Action
+            </h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Finance is the "great enabler" that allows developing nations to bypass fossil-fuel-led growth.
+            </p>
+            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem;">
+                <li style="margin-bottom: 0.5rem;"><strong>Scaling Investment:</strong> Moving from billions to trillions in investments for both mitigation and adaptation.</li>
+                <li><strong>Loss and Damage:</strong> Providing financial support to vulnerable nations already suffering from severe impacts.</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn-outline" id="back-to-dashboard-btn" style="padding: 0.8rem 1.5rem;">
+                <i data-lucide="arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    `;
+
+    setTimeout(() => {
+        container.querySelector('#back-to-dashboard-btn').addEventListener('click', () => {
+            window.location.hash = '#dashboard';
+        });
+    }, 0);
+
+    return container;
+}
+
 function updateAuthUI() {
+    // Keep Dashboard nav button permanently visible
+    if (DOM.dashboardBtn) {
+        DOM.dashboardBtn.style.display = 'block';
+    }
+
     if (state.user) {
         DOM.signinBtn.style.display = 'none';
         DOM.userProfile.style.display = 'flex';

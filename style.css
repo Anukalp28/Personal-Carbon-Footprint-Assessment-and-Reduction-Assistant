@@ -1,17 +1,18 @@
 /* ==========================================================================
    CSS Variables & Tokens
    ========================================================================== */
-   :root {
+:root {
     /* Color Palette - Premium Dark Theme */
     --bg-primary: #0a0a0c;
     --bg-secondary: rgba(25, 25, 30, 0.6);
     --bg-glass: rgba(255, 255, 255, 0.03);
-    
+
     /* Vibrant Accents */
-    --accent-primary: #10b981; /* Emerald/Green */
+    --accent-primary: #10b981;
+    /* Emerald/Green */
     --accent-secondary: #059669;
     --accent-glow: rgba(16, 185, 129, 0.3);
-    
+
     /* Text */
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
@@ -88,7 +89,12 @@ body::after {
     filter: blur(100px);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: var(--font-heading);
     font-weight: 600;
     line-height: 1.2;
@@ -433,9 +439,17 @@ main {
     box-shadow: var(--shadow-glow);
 }
 
-.score-display.low { border-color: var(--accent-primary); }
-.score-display.medium { border-color: #f59e0b; }
-.score-display.high { border-color: #ef4444; }
+.score-display.low {
+    border-color: var(--accent-primary);
+}
+
+.score-display.medium {
+    border-color: #f59e0b;
+}
+
+.score-display.high {
+    border-color: #ef4444;
+}
 
 .score-value {
     font-size: 4rem;
@@ -552,8 +566,15 @@ main {
    Animations
    ========================================================================== */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ==========================================================================
@@ -718,13 +739,94 @@ main {
 }
 
 /* ==========================================================================
+   Dashboard View
+   ========================================================================== */
+.dashboard-view {
+    width: 100%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.dashboard-header {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.dashboard-header h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, #fff, var(--text-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.dash-card {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    transition: var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.dash-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.05), transparent 60%);
+    pointer-events: none;
+}
+
+.dash-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.dash-icon {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    width: 36px;
+    height: 36px;
+}
+
+.dash-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.dash-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
    Responsive
    ========================================================================== */
 @media (max-width: 768px) {
     .landing-title {
         font-size: 2.5rem;
     }
-    
+
     .glass-card {
         padding: 1.5rem;
     }
