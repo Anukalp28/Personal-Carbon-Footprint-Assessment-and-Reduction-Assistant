@@ -280,7 +280,7 @@ function createDashboardView() {
         <div class="dash-header-row">
             <div class="dash-header-text">
                 <h1>Hello, ${userName}</h1>
-                <p>Your conscious efforts are visible. Your carbon footprint is <strong>down 12%</strong> this month. Keep shaping a greener tomorrow.</p>
+                <p id="dash-trend-text">Your conscious efforts are visible. Loading historical data...</p>
             </div>
             <button class="btn-primary" onclick="window.location.hash='#questionnaire'" style="background: #0f3d2b; padding: 0.9rem 1.8rem; font-weight: 600;">Log Daily Activity</button>
         </div>
@@ -293,12 +293,12 @@ function createDashboardView() {
                     
                     <div class="score-stats-row">
                         <div class="score-stat-col">
-                            <p>Carbon Saved</p>
-                            <div><strong>12.4</strong> <span>kg</span></div>
+                            <p id="dash-metric1-label">Avg Footprint</p>
+                            <div><strong id="dash-metric1-val">--</strong> <span>tons</span></div>
                         </div>
                         <div class="score-stat-col">
-                            <p>Trees Saved</p>
-                            <div><strong>3.2</strong> <span>units</span></div>
+                            <p id="dash-metric2-label">Total Logs</p>
+                            <div><strong id="dash-metric2-val">--</strong> <span>days</span></div>
                         </div>
                     </div>
                 </div>
@@ -382,9 +382,57 @@ function createDashboardView() {
         </div>
     `;
 
-    // Ensure icon execution since they were populated via innerHTML
+    // Database Metrics Async Injection
     setTimeout(async () => {
         lucide.createIcons();
+        if (!state.user) return;
+        
+        try {
+            // Load and analyze all log entries dynamically
+            const logs = await db.tracking_logs.where('user_id').equals(state.user.id).toArray();
+            
+            if (logs.length > 0) {
+                logs.sort((a,b) => b.timestamp - a.timestamp);
+                const latest = logs[0];
+                const previous = logs.length > 1 ? logs[1] : latest;
+
+                // Time trend
+                const diff = (latest.tons - previous.tons);
+                const diffPct = previous.tons > 0 ? ((diff / previous.tons) * 100).toFixed(1) : 0;
+                let trendHtml = '';
+                if (diff === 0) {
+                    trendHtml = `remained <strong>stable</strong>`;
+                } else if (diff < 0) {
+                    trendHtml = `gone <strong>down ${Math.abs(diffPct)}%</strong>`;
+                } else {
+                    trendHtml = `gone <strong>up ${diffPct}%</strong>`;
+                }
+                
+                const trendEl = container.querySelector('#dash-trend-text');
+                if(trendEl) trendEl.innerHTML = `Your conscious efforts are visible. Your carbon footprint has ${trendHtml} compared to your last log. Keep shaping a greener tomorrow.`;
+                
+                // Aggregate sums
+                const avg = (logs.reduce((sum, log) => sum + log.tons, 0) / logs.length).toFixed(1);
+                container.querySelector('#dash-metric1-val').innerText = avg;
+                container.querySelector('#dash-metric2-val').innerText = logs.length;
+                
+                // Bottom metrics categories update from last log
+                if (latest.categories) {
+                    const metricVals = container.querySelectorAll('.metric-card .val');
+                    if (metricVals.length >= 4) {
+                        metricVals[0].innerHTML = `${(latest.categories.transport/1000).toFixed(1)} <span>tons</span>`;
+                        metricVals[1].innerHTML = `${(latest.categories.energy/1000).toFixed(1)} <span>tons</span>`;
+                        metricVals[2].innerHTML = `${(latest.categories.diet/1000).toFixed(1)} <span>tons</span>`;
+                        metricVals[3].innerHTML = `${((latest.categories.shopping || 0)/1000).toFixed(1)} <span>tons</span>`;
+                    }
+                }
+            } else {
+                const trendEl = container.querySelector('#dash-trend-text');
+                if(trendEl) trendEl.innerHTML = `Welcome to the dashboard. Complete an assessment to begin tracking your data.`;
+            }
+        } catch(err) {
+            console.error("Dashboard DB fetch error:", err);
+        }
 
         const toggles = container.querySelectorAll('.challenge-toggle');
         toggles.forEach(toggle => {
@@ -396,55 +444,6 @@ function createDashboardView() {
                 saveState();
             });
         });
-
-        // Hydrate Dashboard with Real Database Analytics
-        if (state.user) {
-            try {
-                // Fetch all tracking logs for the active user
-                const logs = await db.tracking_logs.where('user_id').equals(state.user.id).toArray();
-                
-                if (logs.length > 0) {
-                    // Sort descending by timestamp
-                    logs.sort((a,b) => b.timestamp - a.timestamp);
-                    const latest = logs[0];
-                    const avgTons = (logs.reduce((acc, log) => acc + log.tons, 0) / logs.length).toFixed(1);
-                    
-                    // Update main header msg to reflect tracking
-                    const dashMsg = container.querySelector('.dash-header-text p');
-                    if (dashMsg) {
-                        const trend = logs.length > 1 ? (logs[0].tons < logs[1].tons ? 'down' : 'up') : 'stable';
-                        dashMsg.innerHTML = `Your historical average is <strong>${avgTons} tons/year</strong> across ${logs.length} logged assessment(s). Your footprint is ${trend} compared to your last log.`;
-                    }
-                    
-                    // Update Score and Trees
-                    const carbonSavedEl = container.querySelector('.score-stat-col:nth-child(1) div strong');
-                    const treesSavedEl = container.querySelector('.score-stat-col:nth-child(2) div strong');
-                    
-                    // Relative to an extremely high mock global average of 14.9
-                    const carbonSaved = (14.9 - avgTons).toFixed(1);
-                    if(carbonSavedEl) carbonSavedEl.textContent = carbonSaved > 0 ? carbonSaved : '0';
-                    if(treesSavedEl) treesSavedEl.textContent = carbonSaved > 0 ? (carbonSaved * 2.5).toFixed(1) : '0';
-                    
-                    const ecoPointsEl = container.querySelector('.score-main-val');
-                    if (ecoPointsEl) {
-                        let pts = Math.max(0, 1000 - (avgTons * 45));
-                        ecoPointsEl.innerHTML = `${Math.round(pts)} <span>Eco Points</span>`;
-                    }
-                    
-                    // Update detailed metric cards based on latest array categories
-                    if (latest.categories) {
-                        const vals = Object.values(latest.categories);
-                        const metricCards = container.querySelectorAll('.metric-card .val');
-                        for(let i=0; i<Math.min(metricCards.length, vals.length); i++) {
-                            metricCards[i].innerHTML = \`\${(vals[i]/10).toFixed(1)} <span>kg CO2e</span>\`;
-                        }
-                    }
-                }
-            } catch(e) {
-                console.error("Dashboard DB Hydration Error:", e);
-            }
-        }
-
     }, 0);
     return container;
 }
@@ -692,50 +691,12 @@ function createQuestionnaireView() {
             }
         });
 
-        nextBtn.addEventListener('click', async () => {
+        nextBtn.addEventListener('click', () => {
             if (state.answers[currentQ.id] !== undefined) {
                 if (state.currentQuestionIndex < maxQuestions - 1) {
                     state.currentQuestionIndex++;
                     renderView();
                 } else {
-                    // Save to Database
-                    if (state.user) {
-                        try {
-                            const todayStr = new Date().toISOString().split('T')[0];
-                            let totalScore = Object.values(state.answers).reduce((a, b) => a + b, 0);
-                            if (totalScore === 0) totalScore = 21191; // mock fallback
-                            let tons = Number((totalScore / 1000).toFixed(1));
-                            
-                            // Upsert logic for today
-                            const existingLog = await db.tracking_logs
-                                .where('[user_id+date]') // Requires compound index, but wait, we only indexed 'date' right now
-                                .equals([state.user.id, todayStr]) // let's just query normally
-                                .first()
-                                .catch(() => null); // ignore if compound index fails
-                                
-                            // safe fallback query
-                            const logsForUser = await db.tracking_logs.where('user_id').equals(state.user.id).toArray();
-                            const logToday = logsForUser.find(l => l.date === todayStr);
-
-                            if (logToday) {
-                                await db.tracking_logs.update(logToday.id, {
-                                    tons: tons,
-                                    categories: state.answerCategories,
-                                    timestamp: Date.now()
-                                });
-                            } else {
-                                await db.tracking_logs.add({
-                                    user_id: state.user.id,
-                                    date: todayStr,
-                                    timestamp: Date.now(),
-                                    tons: tons,
-                                    categories: state.answerCategories
-                                });
-                            }
-                        } catch(err) {
-                            console.error("Tracking save error", err);
-                        }
-                    }
                     window.location.hash = '#results';
                 }
             }
@@ -767,8 +728,29 @@ function createResultsView() {
     if (Object.keys(state.answerCategories).length === 0) totalScore = 21191;
 
     const tons = (totalScore / 1000).toFixed(1);
-
     const isHigh = totalScore > 10000;
+
+    // Database tracking persistence
+    if (state.user) {
+        const todayStr = new Date().toISOString().split('T')[0];
+        db.tracking_logs.where('user_id').equals(state.user.id).and(log => log.date === todayStr).first().then(existing => {
+            if (!existing) {
+                db.tracking_logs.add({
+                    user_id: state.user.id,
+                    date: todayStr,
+                    timestamp: Date.now(),
+                    tons: parseFloat(tons),
+                    categories: cats
+                });
+            } else {
+                db.tracking_logs.update(existing.id, {
+                    tons: parseFloat(tons),
+                    categories: cats,
+                    timestamp: Date.now()
+                });
+            }
+        }).catch(err => console.error("Tracking log error:", err));
+    }
 
     container.innerHTML = `
         <div class="results-header-actions">
