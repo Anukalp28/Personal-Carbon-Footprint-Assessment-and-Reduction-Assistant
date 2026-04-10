@@ -106,17 +106,17 @@ function loadState() {
 function init() {
     loadState();
     setupGlobalListeners();
-    handleRoute(); 
+    handleRoute();
 }
 
 function setupGlobalListeners() {
     window.addEventListener('hashchange', handleRoute);
-    
+
     const signinBtn = document.getElementById('signin-nav-btn');
     if (signinBtn) {
         signinBtn.addEventListener('click', openAuthModal);
     }
-    
+
     const signoutBtn = document.getElementById('signout-nav-btn');
     if (signoutBtn) {
         signoutBtn.addEventListener('click', () => {
@@ -130,14 +130,14 @@ function setupGlobalListeners() {
             }
         });
     }
-    
+
     // Initial UI check
     updateAuthUI();
 }
 
 function handleRoute() {
     const hash = window.location.hash.slice(1) || 'landing';
-    
+
     // Simple navigation update
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
@@ -163,7 +163,7 @@ function resetState() {
 }
 
 function renderView() {
-    DOM.main.innerHTML = ''; 
+    DOM.main.innerHTML = '';
 
     switch (state.currentView) {
         case 'landing':
@@ -265,7 +265,7 @@ function createLandingView() {
 function createDashboardView() {
     const container = document.createElement('div');
     container.className = 'user-dashboard-view';
-    
+
     // Default to 'Julian' if mock name isn't set, to reflect the screenshot precisely, but dynamic
     const userName = state.user && state.user.name ? state.user.name.split(' ')[0] : 'Julian';
 
@@ -376,9 +376,9 @@ function createDashboardView() {
     `;
 
     // Ensure icon execution since they were populated via innerHTML
-    setTimeout(() => { 
-        lucide.createIcons(); 
-        
+    setTimeout(() => {
+        lucide.createIcons();
+
         const toggles = container.querySelectorAll('.challenge-toggle');
         toggles.forEach(toggle => {
             toggle.addEventListener('click', () => {
@@ -396,7 +396,7 @@ function createDashboardView() {
 function createProfileView() {
     const container = document.createElement('div');
     container.className = 'profile-view';
-    
+
     container.innerHTML = `
         <div class="profile-header">
             <h2>Account Settings</h2>
@@ -461,18 +461,18 @@ function createProfileView() {
             <button type="submit" class="btn-primary" style="margin-top: 1rem;">Save Changes</button>
         </form>
     `;
-    
+
     setTimeout(() => {
         const form = container.querySelector('#profile-form');
         const imgPreview = container.querySelector('#profile-preview-img');
         const fileInput = container.querySelector('#profile-avatar-file');
         let currentBase64Avatar = state.user?.avatar || null;
-        
+
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = function (event) {
                     currentBase64Avatar = event.target.result;
                     imgPreview.src = currentBase64Avatar;
                 };
@@ -491,7 +491,7 @@ function createProfileView() {
             const address = container.querySelector('#profile-address').value;
             const about = container.querySelector('#profile-about').value;
             const achievements = container.querySelector('#profile-achievements').value;
-            
+
             state.user.name = name;
             state.user.email = email;
             state.user.phone = phone;
@@ -501,20 +501,20 @@ function createProfileView() {
             state.user.address = address;
             state.user.about = about;
             state.user.achievements = achievements;
-            
+
             if (currentBase64Avatar) {
                 state.user.avatar = currentBase64Avatar;
             } else {
                 delete state.user.avatar;
             }
-            
+
             saveState();
             updateAuthUI();
-            
+
             window.location.hash = '#landing';
         });
     }, 0);
-    
+
     return container;
 }
 
@@ -549,8 +549,8 @@ function createQuestionnaireView() {
 
             <div class="options-grid">
                 ${currentQ.options.map(opt => {
-                    const isSelected = state.answers[currentQ.id] === opt.impact;
-                    return `
+        const isSelected = state.answers[currentQ.id] === opt.impact;
+        return `
                         <div class="option-card ${isSelected ? 'selected' : ''}" data-impact="${opt.impact}">
                             <i data-lucide="check" class="check-icon" style="width: 16px;"></i>
                             <div class="icon-wrapper">
@@ -560,7 +560,7 @@ function createQuestionnaireView() {
                             <p>${opt.desc}</p>
                         </div>
                     `;
-                }).join('')}
+    }).join('')}
             </div>
 
             ${currentQ.showCadence ? `
@@ -660,7 +660,7 @@ function createResultsView() {
     for (const val of Object.values(state.answers)) {
         totalScore += val;
     }
-    
+
     // Simulated category breakdown if they skipped
     const cats = Object.keys(state.answerCategories).length > 0 ? state.answerCategories : {
         transport: 2423,
@@ -669,11 +669,11 @@ function createResultsView() {
         shopping: 3500,
         travel: 10700
     };
-    
+
     if (Object.keys(state.answerCategories).length === 0) totalScore = 21191;
 
     const tons = (totalScore / 1000).toFixed(1);
-    
+
     const isHigh = totalScore > 10000;
 
     container.innerHTML = `
@@ -706,17 +706,17 @@ function createResultsView() {
                     </div>
                     <div class="legend-container">
                         ${Object.keys(cats).map((cat, i) => {
-                            const colors = ['#1e4d3a', '#2b6e54', '#e5cdb2', '#cf6641', '#a1b08b'];
-                            const color = colors[i % colors.length];
-                            const val = cats[cat];
-                            const pct = Math.round((val / totalScore) * 100);
-                            return `
+        const colors = ['#1e4d3a', '#2b6e54', '#e5cdb2', '#cf6641', '#a1b08b'];
+        const color = colors[i % colors.length];
+        const val = cats[cat];
+        const pct = Math.round((val / totalScore) * 100);
+        return `
                                 <div class="legend-item">
                                     <div class="legend-label"><div class="legend-dot" style="background:${color};"></div> ${cat.charAt(0).toUpperCase() + cat.slice(1)}</div>
                                     <div class="legend-val">${val} kg <span style="color:var(--text-muted); font-size: 0.8em;">(${pct}%)</span></div>
                                 </div>
                             `;
-                        }).join('')}
+    }).join('')}
                     </div>
                 </div>
             </div>
@@ -816,13 +816,13 @@ function createResultsView() {
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { 
-                            beginAtZero: true, 
+                        y: {
+                            beginAtZero: true,
                             max: 24,
                             grid: { color: 'rgba(0,0,0,0.05)' },
                             border: { display: false }
                         },
-                        x: { 
+                        x: {
                             grid: { display: false },
                             border: { display: false }
                         }
@@ -840,45 +840,37 @@ function createResultsView() {
                 lucide.createIcons();
                 
                 try {
+                    // Slight delay to ensure charts are fully rendered
+                    await new Promise(resolve => setTimeout(resolve, 300));
+
                     const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF('p', 'mm', 'a4');
                     
-                    // Capture layout container
-                    const rootLayout = container.querySelector('.results-view-layout') || container;
-                    
-                    const canvas = await html2canvas(rootLayout, {
+                    const canvas = await html2canvas(container, {
                         scale: 2,
-                        backgroundColor: '#f8f9fa', // new light background
-                        useCORS: true
+                        backgroundColor: '#f8f9fa',
+                        useCORS: true,
+                        logging: false
                     });
                     
-                    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                    const imgData = canvas.toDataURL('image/png');
                     
-                    const pdfWidth = doc.internal.pageSize.getWidth();
-                    const pdfHeight = doc.internal.pageSize.getHeight();
+                    // Width of A4 in mm
+                    const pdfWidth = 210; 
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
                     
-                    const canvasWidth = canvas.width;
-                    const canvasHeight = canvas.height;
+                    // Create a PDF with custom dimensions to exactly fit the content as one continuous page
+                    const doc = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: [pdfWidth, pdfHeight]
+                    });
                     
-                    // ratio to fit width
-                    const ratio = pdfWidth / canvasWidth;
-                    const finalHeight = canvasHeight * ratio;
-                    
-                    let yOffset = 0;
-                    let pages = Math.ceil(finalHeight / pdfHeight);
-                    
-                    for (let i = 0; i < pages; i++) {
-                        if (i > 0) {
-                            doc.addPage();
-                        }
-                        // Move image up by page height each time
-                        doc.addImage(imgData, 'JPEG', 0, -(i * pdfHeight), pdfWidth, finalHeight);
-                    }
-
+                    doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
                     doc.save('EcoTrack-Carbon-Report.pdf');
+                    
                 } catch (err) {
                     console.error('Error generating PDF:', err);
-                    alert('Could not generate PDF. Please check console for details.');
+                    alert('Could not generate PDF: ' + err.message);
                 } finally {
                     downloadBtn.innerHTML = originalText;
                     downloadBtn.disabled = false;
@@ -898,7 +890,7 @@ function createResultsView() {
 function updateAuthUI() {
     const signinBtn = document.getElementById('signin-nav-btn');
     const userProfile = document.getElementById('user-profile');
-    
+
     if (state.user) {
         if (signinBtn) signinBtn.style.display = 'none';
         if (userProfile) {
@@ -975,7 +967,7 @@ function openAuthModal() {
         // Close logic
         const closeModal = () => {
             overlay.style.opacity = '0';
-            setTimeout(() => { if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 300);
+            setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 300);
         };
         overlay.querySelector('.close-modal-btn').addEventListener('click', closeModal);
         overlay.addEventListener('click', (e) => {
