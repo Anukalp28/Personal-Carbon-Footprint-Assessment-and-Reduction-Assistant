@@ -966,7 +966,10 @@ function createResultsView() {
                 <i data-lucide="sparkles" style="color: var(--brand-orange)"></i>
                 <span style="font-weight: 600; font-size: 1.1rem;">AI-Powered Recommendations</span>
             </div>
-            <button class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">Get AI Recommendations</button>
+            <button id="trigger-ai-rec-btn" class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">Get AI Recommendations</button>
+        </div>
+
+        <div id="ai-rec-output" style="display: none; margin-top: 1.5rem; padding: 1.5rem; background: rgba(207, 102, 65, 0.05); border: 1px dashed var(--brand-orange); border-radius: var(--radius-md); animation: fadeIn 0.4s;">
         </div>
 
         <div class="wide-card" style="margin-top: 2rem;">
@@ -1060,6 +1063,61 @@ function createResultsView() {
                         }
                     }
                 }
+            });
+        }
+
+        const aiBtn = container.querySelector('#trigger-ai-rec-btn');
+        const aiOutput = container.querySelector('#ai-rec-output');
+        
+        if (aiBtn && aiOutput) {
+            aiBtn.addEventListener('click', () => {
+                aiBtn.disabled = true;
+                aiBtn.innerHTML = '<i data-lucide="loader" style="width:16px; animation: spin 1s linear infinite; margin-right:8px;"></i> Analyzing...';
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    aiBtn.style.display = 'none'; // hide button
+                    aiOutput.style.display = 'block';
+                    
+                    let highestCat = '';
+                    let highestVal = 0;
+                    if (Object.keys(state.answerCategories).length > 0) {
+                        for (const [cat, val] of Object.entries(state.answerCategories)) {
+                            if (val > highestVal) {
+                                highestVal = val;
+                                highestCat = cat;
+                            }
+                        }
+                    }
+
+                    const adviceMap = {
+                        transport: "Your transportation habits are your highest emission source. Try to replace one car trip a week with public transit, walking, or biking.",
+                        diet: "Your diet is your highest emission category. Focus on incorporating more plant-based meals to drastically cut agriculture emissions.",
+                        energy: "Home energy is your highest category! Switch to LED bulbs, unplug appliances, and request green energy from your utility provider.",
+                        shopping: "Your shopping habits are generating a lot of emissions! Aim to buy local, second-hand, and avoid fast fashion.",
+                        travel: "Air travel is heavily impacting your overall score. Reducing flights or choosing train travel has a massive positive impact."
+                    };
+
+                    let recText = "We lack the exact category breakdown from your session. However, addressing Transport and Diet typically yields the best results.";
+                    
+                    if (highestCat) {
+                       recText = `
+                                  <div style="display:flex; align-items:flex-start; gap:1.5rem;">
+                                      <i data-lucide="bot" style="color:var(--brand-orange); width:32px; height:32px; flex-shrink:0;"></i>
+                                      <div>
+                                          <h4 style="color:var(--text-primary); margin-bottom:0.5rem; font-size: 1.1rem;">Insight Generated</h4>
+                                          <p style="color:var(--text-secondary); line-height:1.6; margin-bottom:1rem;">Your highest impact area is <strong>${highestCat.charAt(0).toUpperCase() + highestCat.slice(1)}</strong> at ${(highestVal/1000).toFixed(2)} tons.</p>
+                                          <div style="background: #fff; padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
+                                              <span style="color:var(--brand-orange); font-weight:bold;">💡 Recommendation:</span> ${adviceMap[highestCat] || "Focus on reducing this category first!"}
+                                          </div>
+                                      </div>
+                                  </div>
+                       `;
+                    }
+                    
+                    aiOutput.innerHTML = recText;
+                    lucide.createIcons();
+                }, 1800);
             });
         }
 
@@ -1390,6 +1448,29 @@ function setupChatbot() {
         }
 
         // Semantic Keyword Parsing Sequences
+        if (text.includes("assessment") || text.includes("analyze") || text.includes("categories")) {
+            if (Object.keys(state.answerCategories).length > 0) {
+                let highestCat = '';
+                let highestVal = 0;
+                for (const [cat, val] of Object.entries(state.answerCategories)) {
+                    if (val > highestVal) {
+                        highestVal = val;
+                        highestCat = cat;
+                    }
+                }
+                const adviceMap = {
+                    transport: "Your transportation habits are your highest emission source. Try to replace one car trip a week with public transit, walking, or biking.",
+                    diet: "Your diet is your highest emission category. Focus on incorporating more plant-based meals to drastically cut agriculture emissions.",
+                    energy: "Home energy is your highest category! Switch to LED bulbs, unplug appliances, and request green energy from your utility provider.",
+                    shopping: "Your shopping habits are generating a lot of emissions! Aim to buy local, second-hand, and avoid fast fashion.",
+                    travel: "Air travel is heavily impacting your overall score. Reducing flights or choosing train travel has a massive positive impact."
+                };
+                return `Based on your latest assessment, your highest impact area is <strong>${highestCat.charAt(0).toUpperCase() + highestCat.slice(1)}</strong> at ${(highestVal/1000).toFixed(2)} tons. <br><br>💡 <strong>Recommendation:</strong> ${adviceMap[highestCat] || "Focus on reducing this category first for the biggest environmental impact!"}`;
+            } else if (hasScore) {
+                return "I see your footprint score, but I lack the exact category breakdown from your latest session. However, reducing Transport and Diet usually creates the biggest improvements!";
+            }
+        }
+
         if (text.includes("hello") || text.includes("hi ") || text === "hi") {
             return "Greetings! 🌱 I am EcoBot. " + (hasScore ? "I see your footprint score is " + state.user.score + " tons. How can I help you lower it?" : "I can help you analyze your carbon footprint. You should start by taking the Analysis assessment!");
         }
