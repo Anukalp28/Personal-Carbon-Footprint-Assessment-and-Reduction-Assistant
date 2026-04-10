@@ -830,6 +830,62 @@ function createResultsView() {
                 }
             });
         }
+
+        const downloadBtn = container.querySelector('#download-pdf-btn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', async () => {
+                const originalText = downloadBtn.innerHTML;
+                downloadBtn.innerHTML = '<i data-lucide="loader" style="width:18px; margin-right:8px; animation: spin 1s linear infinite;"></i> Generating PDF...';
+                downloadBtn.disabled = true;
+                lucide.createIcons();
+                
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('p', 'mm', 'a4');
+                    
+                    // Capture layout container
+                    const rootLayout = container.querySelector('.results-view-layout') || container;
+                    
+                    const canvas = await html2canvas(rootLayout, {
+                        scale: 2,
+                        backgroundColor: '#f8f9fa', // new light background
+                        useCORS: true
+                    });
+                    
+                    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                    
+                    const pdfWidth = doc.internal.pageSize.getWidth();
+                    const pdfHeight = doc.internal.pageSize.getHeight();
+                    
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
+                    
+                    // ratio to fit width
+                    const ratio = pdfWidth / canvasWidth;
+                    const finalHeight = canvasHeight * ratio;
+                    
+                    let yOffset = 0;
+                    let pages = Math.ceil(finalHeight / pdfHeight);
+                    
+                    for (let i = 0; i < pages; i++) {
+                        if (i > 0) {
+                            doc.addPage();
+                        }
+                        // Move image up by page height each time
+                        doc.addImage(imgData, 'JPEG', 0, -(i * pdfHeight), pdfWidth, finalHeight);
+                    }
+
+                    doc.save('EcoTrack-Carbon-Report.pdf');
+                } catch (err) {
+                    console.error('Error generating PDF:', err);
+                    alert('Could not generate PDF. Please check console for details.');
+                } finally {
+                    downloadBtn.innerHTML = originalText;
+                    downloadBtn.disabled = false;
+                    lucide.createIcons();
+                }
+            });
+        }
     }, 0);
 
     return container;
