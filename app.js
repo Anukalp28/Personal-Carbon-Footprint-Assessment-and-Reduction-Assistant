@@ -214,29 +214,74 @@ function renderView() {
 function createAboutView() {
     const container = document.createElement('div');
     container.innerHTML = `
-        <div style="max-width: 800px; margin: 4rem auto; padding: 3rem; background: var(--bg-secondary); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); text-align: center;">
-            <i data-lucide="leaf" style="color: var(--accent-primary); width: 56px; height: 56px; margin-bottom: 1.5rem;"></i>
-            <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary);">About EcoTrack</h2>
-            <p style="font-size: 1.15rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 2.5rem;">
-                EcoTrack was created during the <strong>Hack Horizon 2.0</strong> Hackathon at <strong>Arka JAIN University</strong>. Our mission is to empower individuals to quantify, understand, and dramatically reduce their carbon legacy.
-            </p>
-            <div style="text-align: left; background: var(--bg-primary); padding: 2.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-                <h3 style="margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-                    <i data-lucide="globe-2" style="width: 20px;"></i> Our Vision
-                </h3>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">We believe that the greatest threat to our planet is the belief that someone else will save it. By providing a personalized dashboard, an interactive lifestyle questionnaire, and deep analytics, we aim to transform passive eco-anxiety into actionable, data-driven climate action.</p>
-                
-                <h3 style="margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-                    <i data-lucide="users" style="width: 20px;"></i> Hackathon Contributors
-                </h3>
-                <ul style="color: var(--text-secondary); line-height: 2; list-style-type: none; padding-left: 0;">
-                    <li style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="check-circle" style="width:16px; color:var(--accent-primary);"></i> <strong>Anukalp</strong> - Member 1</li>
-                    <li style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="check-circle" style="width:16px; color:var(--accent-primary);"></i> <strong>Anubhav Shreshtha</strong> - Member 2</li>
-                    <li style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="check-circle" style="width:16px; color:var(--accent-primary);"></i> <strong>Member 3</strong> - Role</li>
-                    <li style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="check-circle" style="width:16px; color:var(--accent-primary);"></i> <strong>Member 4</strong> - Role</li>
-                    <li style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="check-circle" style="width:16px; color:var(--accent-primary);"></i> <strong>Member 5</strong> - Role</li>
-                </ul>
+        <div style="max-width: 800px; margin: 4rem auto; padding: 3rem; background: var(--bg-secondary); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); text-align: left;">
+            
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 2.5rem; color: var(--text-primary);">🌍 About Us</h2>
             </div>
+            
+            <p style="font-size: 1.15rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 2rem; text-align: center;">
+                Welcome to our <strong>Personal Carbon Footprint Assessment & Reduction Assistant</strong> 🌱💡 — a smart web-based platform designed to help individuals <strong>understand, measure, and reduce</strong> their environmental impact.
+            </p>
+            
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 2rem;">
+                Our website calculates carbon emissions generated from daily activities such as 🚗 <strong>transportation</strong>, ⚡ <strong>energy consumption</strong>, 🥗 <strong>diet</strong>, 🛒 <strong>shopping</strong>, and ✈️ <strong>travel</strong>. With just a few inputs, users can discover how their lifestyle affects the planet 🌎.
+            </p>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 2rem 0;">
+
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">🎯 Our Mission</h3>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+                Our goal is simple yet powerful — to <strong>raise awareness about climate change</strong> 🌡️ and inspire people to adopt <strong>eco-friendly and sustainable habits</strong> ♻️.
+            </p>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 2rem;">
+                By providing <strong>accurate carbon estimates</strong> 📊 along with <strong>personalized suggestions</strong> 💡, we aim to guide users toward a <strong>greener, cleaner, and healthier future</strong> 🌿✨.
+            </p>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 2rem 0;">
+
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">⚙️ How It Works</h3>
+            <ul style="color: var(--text-secondary); line-height: 1.8; list-style-type: none; padding-left: 0; margin-bottom: 1.5rem;">
+                <li>🔹 Users enter their daily activity data</li>
+                <li>🔹 The system calculates their <strong>carbon footprint (kg CO₂)</strong></li>
+                <li>🔹 Smart suggestions are provided to <strong>reduce emissions</strong></li>
+            </ul>
+            <p style="color: var(--accent-primary); font-weight: 500; font-style: italic;">👉 Measure ➝ Understand ➝ Improve 🌸</p>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 2rem 0;">
+
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">👨💻 Our Team</h3>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 2rem;">
+                This project is developed by <strong>B.Tech (AI & ML) students</strong> 🎓 of <strong>Arka Jain University</strong> as part of an academic initiative focused on <strong>environmental sustainability 🌍</strong> and <strong>innovation 💻</strong>.
+            </p>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 2rem 0;">
+
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">🌱 Our Belief</h3>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 2rem;">
+                We believe that <strong>small individual actions</strong> 🌼, when combined, can create <strong>big positive changes</strong> for our planet 🌎💚.
+            </p>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 2rem 0;">
+
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">🔮 Future Vision</h3>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+                In the future, we plan to enhance this platform with:
+            </p>
+            <ul style="color: var(--text-secondary); line-height: 1.8; list-style-type: none; padding-left: 0; margin-bottom: 1rem;">
+                <li>✨ Real-time data tracking 📡</li>
+                <li>📱 Mobile application integration</li>
+                <li>🤖 AI-based smart recommendations</li>
+            </ul>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 2rem;">
+                to make the system more <strong>intelligent, efficient, and user-friendly</strong> 🚀.
+            </p>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 2rem 0;">
+            
+            <p style="text-align: center; color: var(--accent-primary); font-weight: 600; font-style: italic; font-size: 1.2rem;">
+                🌿 Together, let’s build a sustainable future! 🌍💚
+            </p>
         </div>
     `;
     setTimeout(() => lucide.createIcons(), 0);
