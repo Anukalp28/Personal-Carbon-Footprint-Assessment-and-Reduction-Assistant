@@ -187,10 +187,7 @@ function renderView() {
             DOM.main.appendChild(createResultsView());
             break;
         case 'solutions':
-            // Fallback for solutions tab mock
-            const div = document.createElement('div');
-            div.innerHTML = '<div style="text-align:center; padding: 100px;"><h2>Community & Solutions</h2><p>Coming Soon</p></div>';
-            DOM.main.appendChild(div);
+            DOM.main.appendChild(createSolutionsView());
             break;
         case 'about':
             DOM.main.appendChild(createAboutView());
@@ -210,6 +207,82 @@ function renderView() {
 // ==========================================================================
 // Views
 // ==========================================================================
+
+function createSolutionsView() {
+    const container = document.createElement('div');
+    container.innerHTML = `
+        <div style="max-width: 1100px; margin: 4rem auto; padding: 2rem;">
+            
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h2 style="font-size: 2.8rem; color: var(--accent-primary); margin-bottom: 1rem;">UN Climate Solutions</h2>
+                <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; line-height: 1.6;">
+                    Everyone can help limit climate change. From the way we travel, to the electricity we use and the food we eat, we can make a difference. Start with these targeted global actions.
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; transition: transform 0.3s, box-shadow 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <i data-lucide="home" style="color: var(--accent-primary); width: 32px; height: 32px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">Save energy at home</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">Much of our electricity and heat are powered by coal, oil and gas. Use less energy by lowering your heating and cooling, switching to LED light bulbs and energy-efficient electric appliances.</p>
+                </div>
+
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; transition: transform 0.3s, box-shadow 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <i data-lucide="bike" style="color: var(--accent-primary); width: 32px; height: 32px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">Walk, bike, or take transit</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">The world’s roads are clogged with vehicles, most of them burning fossil fuels. Walking or riding a bike instead of driving will reduce greenhouse gas emissions immediately.</p>
+                </div>
+
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; transition: transform 0.3s, box-shadow 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <i data-lucide="salad" style="color: var(--accent-primary); width: 32px; height: 32px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">Eat more vegetables</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">Eating more plant-based meals – vegetables, fruits, whole grains, legumes, nuts and seeds – and less meat and dairy, can significantly lower your environmental impact.</p>
+                </div>
+
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; transition: transform 0.3s, box-shadow 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <i data-lucide="plane" style="color: var(--accent-primary); width: 32px; height: 32px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">Consider your travel</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">Airplanes emit large amounts of greenhouse gases, producing significant climate change impacts. Traveling virtually or choosing localized journeys is a fast reduction strategy.</p>
+                </div>
+
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; transition: transform 0.3s, box-shadow 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <i data-lucide="trash-2" style="color: var(--accent-primary); width: 32px; height: 32px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">Throw away less food</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">When you throw food away, you're also wasting the resources and energy that were used to grow, produce, package, and transport it.</p>
+                </div>
+
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; transition: transform 0.3s, box-shadow 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <i data-lucide="refresh-cw" style="color: var(--accent-primary); width: 32px; height: 32px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">Reduce, reuse, recycle</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">Electronics, clothes and other items we buy cause carbon emissions at each point in production, from the extraction of raw materials to manufacturing.</p>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; transition: transform 0.3s, box-shadow 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <i data-lucide="sun" style="color: var(--accent-primary); width: 32px; height: 32px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">Green energy sources</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">If possible, see if you can switch your home grid to renewable sources such as wind or solar. Alternatively, install localized solar panels to decrease grid reliance.</p>
+                </div>
+
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; transition: transform 0.3s, box-shadow 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <i data-lucide="zap" style="color: var(--accent-primary); width: 32px; height: 32px; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">Electric transportation</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">If you plan to buy a car, consider going electric. In many countries, electric cars help reduce air pollution and cause drastically fewer greenhouse gas emissions.</p>
+                </div>
+
+            </div>
+            
+            <div style="text-align:center; margin-top:4rem;">
+                <a href="https://www.un.org/en/climatechange/climate-solutions" target="_blank" style="color: var(--accent-primary); text-decoration: none; font-weight: 600; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.5rem; border: 2px solid var(--accent-primary); border-radius: var(--radius-full); transition: all 0.3s;" onmouseover="this.style.background='var(--accent-primary)'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-primary)';">
+                    Read the official UN Report <i data-lucide="external-link" style="width:18px;"></i>
+                </a>
+            </div>
+
+        </div>
+    `;
+    setTimeout(() => lucide.createIcons(), 0);
+    return container;
+}
 
 function createAboutView() {
     const container = document.createElement('div');
