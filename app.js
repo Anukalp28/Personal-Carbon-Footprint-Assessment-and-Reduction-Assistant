@@ -153,7 +153,7 @@ function handleRoute() {
         }
     });
 
-    if (['landing', 'questionnaire', 'results', 'solutions', 'profile'].includes(hash)) {
+    if (['landing', 'questionnaire', 'results', 'solutions', 'about', 'profile'].includes(hash)) {
         state.currentView = hash;
     } else {
         state.currentView = 'landing';
@@ -192,6 +192,9 @@ function renderView() {
             div.innerHTML = '<div style="text-align:center; padding: 100px;"><h2>Community & Solutions</h2><p>Coming Soon</p></div>';
             DOM.main.appendChild(div);
             break;
+        case 'about':
+            DOM.main.appendChild(createAboutView());
+            break;
         case 'profile':
             if (!state.user) {
                 window.location.hash = '#landing';
@@ -207,6 +210,38 @@ function renderView() {
 // ==========================================================================
 // Views
 // ==========================================================================
+
+function createAboutView() {
+    const container = document.createElement('div');
+    container.innerHTML = `
+        <div style="max-width: 800px; margin: 4rem auto; padding: 3rem; background: var(--bg-secondary); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); text-align: center;">
+            <i data-lucide="leaf" style="color: var(--accent-primary); width: 56px; height: 56px; margin-bottom: 1.5rem;"></i>
+            <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary);">About EcoTrack</h2>
+            <p style="font-size: 1.15rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 2.5rem;">
+                EcoTrack was created during the <strong>Hack Horizon 2.0</strong> Hackathon at <strong>Arka JAIN University</strong>. Our mission is to empower individuals to quantify, understand, and dramatically reduce their carbon legacy.
+            </p>
+            <div style="text-align: left; background: var(--bg-primary); padding: 2.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="globe-2" style="width: 20px;"></i> Our Vision
+                </h3>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">We believe that the greatest threat to our planet is the belief that someone else will save it. By providing a personalized dashboard, an interactive lifestyle questionnaire, and deep analytics, we aim to transform passive eco-anxiety into actionable, data-driven climate action.</p>
+                
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="users" style="width: 20px;"></i> Hackathon Contributors
+                </h3>
+                <ul style="color: var(--text-secondary); line-height: 2; list-style-type: none; padding-left: 0;">
+                    <li style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="check-circle" style="width:16px; color:var(--accent-primary);"></i> <strong>Anukalp</strong> - Member 1</li>
+                    <li style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="check-circle" style="width:16px; color:var(--accent-primary);"></i> <strong>Anubhav Shreshtha</strong> - Member 2</li>
+                    <li style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="check-circle" style="width:16px; color:var(--accent-primary);"></i> <strong>Member 3</strong> - Role</li>
+                    <li style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="check-circle" style="width:16px; color:var(--accent-primary);"></i> <strong>Member 4</strong> - Role</li>
+                    <li style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="check-circle" style="width:16px; color:var(--accent-primary);"></i> <strong>Member 5</strong> - Role</li>
+                </ul>
+            </div>
+        </div>
+    `;
+    setTimeout(() => lucide.createIcons(), 0);
+    return container;
+}
 
 function createLandingView() {
     const container = document.createElement('div');
