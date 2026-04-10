@@ -50,7 +50,7 @@ Proudly designed and engineered by our team of 5 B.Tech (AI & ML) students for *
 | **Subhradeep sur** | _Frontend Specialist & UI/UX_ | [GitHub Profile](https://github.com/Subhradeep7845) |
 | **Ankit Kumar** | _Backend & Debugging_ | [GitHub Profile](https://github.com/ankitkumar6202) |
 | **Atufa Khan** | _Research & Integration_ | [GitHub Profile](https://github.com/atufa2603-ops) |
-| **Arpita Aarushi Lala** | _Documentation & Presentation_ | [GitHub Profile](https://github.com/aarushiarpita-ux) |
+| **Arpita Aarushi Lala@@@** | _Documentation & Presentation_ | [GitHub Profile](https://github.com/aarushiarpita-ux) |
 
 <br/>
 
