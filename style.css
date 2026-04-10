@@ -582,11 +582,13 @@ main {
     margin-top: 2rem;
     border-top: 1px solid var(--border-subtle);
     padding-top: 2rem;
-    animation: fadeInSlideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1) forwards;
+    opacity: 0;
+    animation: slideUpFade 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation-delay: 0.3s;
 }
 
-@keyframes fadeInSlideUp {
-    0% { opacity: 0; transform: translateY(15px); }
+@keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(20px); }
     100% { opacity: 1; transform: translateY(0); }
 }
 
@@ -609,30 +611,22 @@ main {
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    opacity: 0;
-    animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1);
 }
 
-.cadence-pill:nth-child(1) { animation-delay: 0.1s; }
-.cadence-pill:nth-child(2) { animation-delay: 0.2s; }
-.cadence-pill:nth-child(3) { animation-delay: 0.3s; }
-.cadence-pill:nth-child(4) { animation-delay: 0.4s; }
-
 .cadence-pill:hover {
-    background: var(--accent-primary);
+    background: var(--accent-primary); /* Dark Green */
     color: #fff;
     border-color: var(--accent-primary);
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 15px rgba(30, 77, 58, 0.2);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 5px 15px rgba(30, 77, 58, 0.15);
 }
 
 .cadence-pill.selected {
     background: var(--accent-primary);
     color: #fff;
     border-color: var(--accent-primary);
-    transform: scale(1.05);
-    animation: tileGlowPulse 2s infinite cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 5px 15px rgba(30, 77, 58, 0.25);
 }
 
 .question-actions-row {
