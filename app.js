@@ -138,8 +138,125 @@ function setupGlobalListeners() {
         });
     }
 
+    const aiChatBtn = document.getElementById('ai-chat-btn');
+    const aiChatDrawer = document.getElementById('ai-chat-drawer');
+    const closeChatBtn = document.getElementById('close-chat-btn');
+    const chatForm = document.getElementById('chat-form');
+
+    if (aiChatBtn && aiChatDrawer) {
+        aiChatBtn.addEventListener('click', () => {
+            aiChatDrawer.classList.add('open');
+        });
+    }
+
+    if (closeChatBtn && aiChatDrawer) {
+        closeChatBtn.addEventListener('click', () => {
+            aiChatDrawer.classList.remove('open');
+        });
+    }
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', handleChatSubmit);
+    }
+
     // Initial UI check
     updateAuthUI();
+}
+
+// ==========================================================================
+// AI Chatbot Logic (Simulated Context-Aware Engine)
+// ==========================================================================
+
+function handleChatSubmit(e) {
+    e.preventDefault();
+    const inputField = document.getElementById('chat-input');
+    const message = inputField.value.trim();
+    if (!message) return;
+
+    appendChatMessage(message, 'user');
+    inputField.value = '';
+
+    // Simulate Network Latency + AI typing
+    showTypingIndicator();
+
+    setTimeout(() => {
+        removeTypingIndicator();
+        const aiResponse = generateAIResponse(message.toLowerCase());
+        appendChatMessage(aiResponse, 'ai');
+    }, 1500 + Math.random() * 1000);
+}
+
+function appendChatMessage(text, sender) {
+    const chatMessages = document.getElementById('chat-messages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = \`chat-msg \${sender}-msg\`;
+    msgDiv.textContent = text;
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
+}
+
+function showTypingIndicator() {
+    const chatMessages = document.getElementById('chat-messages');
+    const indicator = document.createElement('div');
+    indicator.className = 'chat-msg ai-msg typing-indicator-container';
+    indicator.id = 'typing-indicator';
+    indicator.innerHTML = \`<div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>\`;
+    chatMessages.appendChild(indicator);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function removeTypingIndicator() {
+    const indicator = document.getElementById('typing-indicator');
+    if (indicator) indicator.remove();
+}
+
+function generateAIResponse(query) {
+    // Read Context
+    const score = state.user?.score || 0;
+    const hasScore = score > 0;
+    const diet = state.answerCategories?.food || 0;
+    const transport = state.answerCategories?.transport || 0;
+
+    // Pattern Matching Logic based on Keywords
+    if (query.includes('hello') || query.includes('hi')) {
+        return "Hello! I'm your Eco-Assistant. You can ask me how to reduce your carbon footprint, or ask for an analysis of your current score!";
+    }
+    
+    if (query.includes('score') || query.includes('footprint') || query.includes('my emissions')) {
+        if (!hasScore) {
+            return "I don't see a carbon score for you yet! Please navigate to the 'Analysis' tab to complete your lifestyle questionnaire.";
+        }
+        if (score > 10000) {
+            return \`Your estimated carbon footprint is \${(score/1000).toFixed(1)} tons/year. This is above the global average. The fastest way to reduce this is often tackling transportation and diet first. Ask me how!\`;
+        } else {
+            return \`Your estimated carbon footprint is \${(score/1000).toFixed(1)} tons/year! That's quite good. You can try refining local energy sources to lower it even further.\`;
+        }
+    }
+
+    if (query.includes('car') || query.includes('transport') || query.includes('drive')) {
+        if (transport > 3000) {
+            return "Given your responses, transportation is a major factor for you. Consider carpooling, switching to an EV, or simply replacing short drives with a bike! Even 1 less driving day a week saves ~400kg of CO2 yearly.";
+        }
+        return "Using public transport, walking, bicycling, or an electric vehicle immediately reduces greenhouse gases compared to standard combustion engines.";
+    }
+
+    if (query.includes('food') || query.includes('diet') || query.includes('eat') || query.includes('meat')) {
+        if (diet > 3000) {
+            return "Your dietary footprint is somewhat high! You don't have to go fully vegan. Even swapping beef for chicken twice a week reduces your food emissions by nearly 30%.";
+        }
+        return "Eating more plant-based meals (beans, lentils, vegetables) and buying locally sourced produce dramatically cuts the carbon required to transport and refrigerate your food.";
+    }
+
+    if (query.includes('energy') || query.includes('electricity') || query.includes('home')) {
+        return "At home, switching to LED bulbs, washing clothes in cold water, and adjusting your thermostat by 1-2 degrees can collectively save up to 500kg of CO2 per year!";
+    }
+    
+    if (query.includes('thank')) {
+        return "You're very welcome! Let's keep working together toward a sustainable future. 🌍💚";
+    }
+
+    // Default Fallback
+    return "That's a great question! Based on UN guidelines, the best universal actions are reducing meat consumption, minimizing air travel, and switching to renewable energy at home. Would you like to know more about one of those?";
 }
 
 function handleRoute() {
