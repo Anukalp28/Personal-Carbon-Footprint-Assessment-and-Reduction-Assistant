@@ -21,7 +21,14 @@
                 <i data-lucide="leaf"></i>
                 <span>EcoTrack</span>
             </div>
-            <button class="nav-button" id="start-nav-btn">Start Assessment</button>
+            <div class="nav-right" style="display: flex; gap: 1rem; align-items: center;">
+                <button class="nav-button" id="start-nav-btn">Start Assessment</button>
+                <button class="btn-outline" id="signin-nav-btn" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">Sign In</button>
+                <div id="user-profile" style="display: none; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+                    <div class="user-avatar" id="user-avatar-icon" style="width: 35px; height: 35px; background: var(--accent-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #fff;">U</div>
+                    <button class="nav-button" id="signout-nav-btn" style="padding: 0.5rem 1.25rem; font-size: 0.9rem; background: transparent; border-color: transparent;">Sign Out</button>
+                </div>
+            </div>
         </nav>
 
         <!-- Dynamic Content Container -->

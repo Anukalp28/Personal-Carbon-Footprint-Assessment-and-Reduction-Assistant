@@ -3,10 +3,11 @@
 // ==========================================================================
 
 const state = {
-    currentView: 'landing', // 'landing', 'questionnaire', 'results'
+    currentView: 'landing', // 'landing', 'questionnaire', 'results', 'manual-entry'
     currentQuestionIndex: 0,
     answers: {}, // { questionId: selectedOptionImpactValue }
-    answerCategories: {} // { categoryName: accumulatedValue }
+    answerCategories: {}, // { categoryName: accumulatedValue }
+    user: null
 };
 
 const questions = [
@@ -76,7 +77,11 @@ const questions = [
 const DOM = {
     main: document.getElementById('main-content'),
     navBtn: document.getElementById('start-nav-btn'),
-    logo: document.querySelector('.logo')
+    logo: document.querySelector('.logo'),
+    signinBtn: document.getElementById('signin-nav-btn'),
+    signoutBtn: document.getElementById('signout-nav-btn'),
+    userProfile: document.getElementById('user-profile'),
+    userAvatar: document.getElementById('user-avatar-icon')
 };
 
 function init() {
@@ -98,19 +103,30 @@ function setupGlobalListeners() {
     DOM.logo.addEventListener('click', () => {
         window.location.hash = '#landing';
     });
+
+    if (DOM.signinBtn) {
+        DOM.signinBtn.addEventListener('click', openAuthModal);
+    }
+
+    if (DOM.signoutBtn) {
+        DOM.signoutBtn.addEventListener('click', () => {
+            state.user = null;
+            updateAuthUI();
+        });
+    }
 }
 
 function handleRoute() {
     const hash = window.location.hash.slice(1) || 'landing';
-    
+
     // Only allow valid views
-    if (['landing', 'questionnaire', 'results'].includes(hash)) {
+    if (['landing', 'questionnaire', 'results', 'manual-entry'].includes(hash)) {
         state.currentView = hash;
     } else {
         state.currentView = 'landing';
         window.location.hash = '#landing';
     }
-    
+
     renderView();
 }
 
@@ -122,7 +138,7 @@ function resetState() {
 
 function renderView() {
     DOM.main.innerHTML = ''; // Clear current content
-    
+
     // Update Nav Button based on context
     if (state.currentView === 'landing' || state.currentView === 'results') {
         DOM.navBtn.style.display = 'block';
@@ -138,11 +154,14 @@ function renderView() {
         case 'questionnaire':
             DOM.main.appendChild(createQuestionnaireView());
             break;
+        case 'manual-entry':
+            DOM.main.appendChild(createManualEntryView());
+            break;
         case 'results':
             DOM.main.appendChild(createResultsView());
             break;
     }
-    
+
     // Re-initialize Lucide icons for dynamically added content
     lucide.createIcons();
 }
@@ -154,14 +173,19 @@ function renderView() {
 function createLandingView() {
     const container = document.createElement('div');
     container.className = 'landing-view';
-    
+
     container.innerHTML = `
         <h1 class="landing-title">Understand Your<br><span>Environmental Impact</span></h1>
-        <p class="landing-subtitle">Take our quick assessment to calculate your carbon footprint and discover actionable, personalized steps to a sustainable future.</p>
+        <p class="landing-subtitle">Choose how you'd like to calculate your carbon footprint:</p>
         
-        <button class="btn-primary" id="start-btn" style="font-size: 1.1rem; padding: 1rem 2rem;">
-            Calculate My Footprint
-        </button>
+        <div class="calculation-options" style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap;">
+            <button class="btn-primary" id="guided-btn" style="font-size: 1.1rem; padding: 1rem 2rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="list-checks"></i> Guided Assessment
+            </button>
+            <button class="btn-secondary" id="manual-btn" style="font-size: 1.1rem; padding: 1rem 2rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="calculator"></i> Manual Entry
+            </button>
+        </div>
 
         <div class="features-grid">
             <div class="feature-card">
@@ -183,9 +207,13 @@ function createLandingView() {
     `;
 
     setTimeout(() => {
-        container.querySelector('#start-btn').addEventListener('click', () => {
+        container.querySelector('#guided-btn').addEventListener('click', () => {
             resetState();
             window.location.hash = '#questionnaire';
+        });
+        container.querySelector('#manual-btn').addEventListener('click', () => {
+            resetState();
+            window.location.hash = '#manual-entry';
         });
     }, 0);
 
@@ -196,7 +224,7 @@ function createLandingView() {
 function createQuestionnaireView() {
     const container = document.createElement('div');
     container.className = 'question-view';
-    
+
     const maxQuestions = questions.length;
     const progressPercent = (state.currentQuestionIndex / maxQuestions) * 100;
     const currentQ = questions[state.currentQuestionIndex];
@@ -214,8 +242,8 @@ function createQuestionnaireView() {
 
             <div class="options-grid">
                 ${currentQ.options.map(opt => {
-                    const isSelected = state.answers[currentQ.id] === opt.impact;
-                    return `
+        const isSelected = state.answers[currentQ.id] === opt.impact;
+        return `
                         <div class="option-card ${isSelected ? 'selected' : ''}" data-impact="${opt.impact}">
                             <div class="option-icon">
                                 <i data-lucide="${opt.icon}"></i>
@@ -226,7 +254,7 @@ function createQuestionnaireView() {
                             </div>
                         </div>
                     `;
-                }).join('')}
+    }).join('')}
             </div>
 
             <div class="question-actions">
@@ -251,7 +279,7 @@ function createQuestionnaireView() {
                 optionCards.forEach(c => c.classList.remove('selected'));
                 // Add to clicked
                 card.classList.add('selected');
-                
+
                 // Save state
                 const impact = parseInt(card.getAttribute('data-impact'), 10);
                 state.answers[currentQ.id] = impact;
@@ -287,10 +315,93 @@ function createQuestionnaireView() {
 }
 
 
+function createManualEntryView() {
+    const container = document.createElement('div');
+    container.className = 'manual-entry-view';
+
+    container.innerHTML = `
+        <div class="glass-card" style="margin: 0 auto;">
+            <div class="question-header">
+                <h2>Manual Energy Usage Entry</h2>
+                <p>Enter your estimated annual usage for the following categories to calculate your footprint.</p>
+            </div>
+            <form id="manual-entry-form" class="manual-form">
+                <div class="form-group">
+                    <label>Transportation (Miles driven per year)</label>
+                    <div class="input-with-icon">
+                        <i data-lucide="car"></i>
+                        <input type="number" id="manual-transport" placeholder="e.g., 10000" class="manual-input" required min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Home Energy (kWh per year)</label>
+                    <div class="input-with-icon">
+                        <i data-lucide="zap"></i>
+                        <input type="number" id="manual-energy" placeholder="e.g., 10500" class="manual-input" required min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Flights (Hours flown per year)</label>
+                    <div class="input-with-icon">
+                        <i data-lucide="plane"></i>
+                        <input type="number" id="manual-flights" placeholder="e.g., 10" class="manual-input" required min="0">
+                    </div>
+                </div>
+                
+                <div class="question-actions" style="margin-top: 2rem; justify-content: center;">
+                    <button type="submit" class="btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem; width: 100%; max-width: 300px;">
+                        Calculate Results
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    setTimeout(() => {
+        const form = container.querySelector('#manual-entry-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Basic generic calculations, mapping values to estimated kg CO2e
+            const transportMiles = parseFloat(container.querySelector('#manual-transport').value) || 0;
+            const transportImpact = Math.round(transportMiles * 0.404); // ~0.404 kg CO2 per mile driven
+
+            const energyKwh = parseFloat(container.querySelector('#manual-energy').value) || 0;
+            const energyImpact = Math.round(energyKwh * 0.385); // ~0.385 kg CO2 per kWh
+
+            const flightsHours = parseFloat(container.querySelector('#manual-flights').value) || 0;
+            const flightImpact = Math.round(flightsHours * 250); // ~250 kg CO2 per hour of flying
+
+            // Set state categories directly (adding some average assumptions for un-entered items like Diet/Shopping)
+            state.answerCategories = {
+                transportation: transportImpact,
+                energy: energyImpact,
+                travel: flightImpact,
+                diet: 1500, // Average kg
+                shopping: 1000 // Average kg
+            };
+
+            // Set state answers to be total sum parts
+            state.answers = {
+                transport: transportImpact,
+                energy: energyImpact,
+                travel: flightImpact,
+                diet: 1500,
+                shopping: 1000
+            };
+
+            // Navigate to results
+            window.location.hash = '#results';
+        });
+    }, 0);
+
+    return container;
+}
+
 function createResultsView() {
     const container = document.createElement('div');
     container.className = 'results-view';
-    
+
     // Calculate total score
     let totalScore = 0;
     for (const val of Object.values(state.answers)) {
@@ -320,7 +431,7 @@ function createResultsView() {
                 ${Object.keys(state.answerCategories).map(cat => `
                     <div class="breakdown-item">
                         <div class="breakdown-label">${cat}</div>
-                        <div class="breakdown-val">${state.answerCategories[cat]} <span style="font-size:0.7em;color:var(--text-secondary)">kg</span></div>
+                        <div class="breakdown-val">${state.answerCategories[cat]} <span style="font-size:0.7em;color:var(--text-secondary)">kg CO₂</span></div>
                     </div>
                 `).join('')}
             </div>
@@ -394,7 +505,7 @@ function generateRecommendations() {
     }
 
     if (cats.travel > 2000) {
-         recsHTML += `
+        recsHTML += `
             <div class="rec-card">
                 <div class="rec-icon"><i data-lucide="train"></i></div>
                 <div class="rec-content">
@@ -403,7 +514,7 @@ function generateRecommendations() {
                 </div>
             </div>`;
     }
-    
+
     // Generic recommendation if score is somehow super low across the board
     if (recsHTML === '') {
         recsHTML += `
@@ -438,6 +549,123 @@ function generateOffsets() {
             </div>
         </div>
     `;
+}
+
+function updateAuthUI() {
+    if (state.user) {
+        DOM.signinBtn.style.display = 'none';
+        DOM.userProfile.style.display = 'flex';
+        DOM.userAvatar.textContent = state.user.name ? state.user.name.charAt(0).toUpperCase() : 'U';
+    } else {
+        DOM.signinBtn.style.display = 'block';
+        DOM.userProfile.style.display = 'none';
+    }
+}
+
+function openAuthModal() {
+    let overlay = document.getElementById('auth-modal');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'auth-modal-overlay';
+        overlay.id = 'auth-modal';
+        overlay.innerHTML = `
+            <div class="glass-card auth-modal-card">
+                <button class="close-modal-btn" id="close-auth"><i data-lucide="x"></i></button>
+                <div class="auth-header" style="text-align: center; margin-bottom: 2rem;">
+                    <h2 id="auth-title">Welcome to EcoTrack</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;" id="auth-subtitle">Sign in to continue</p>
+                </div>
+                
+                <div class="auth-providers">
+                    <button class="btn-provider google-provider" id="google-login-btn">
+                        <img src="https:&#x2F;&#x2F;www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" height="20">
+                        Continue with Google
+                    </button>
+                </div>
+                
+                <div class="auth-divider">
+                    <span>or sign in with email</span>
+                </div>
+                
+                <form id="auth-form" class="auth-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <div class="input-with-icon">
+                            <i data-lucide="mail"></i>
+                            <input type="email" id="auth-email" class="manual-input" style="padding-left: 3.5rem;" placeholder="you@example.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-with-icon">
+                            <i data-lucide="lock"></i>
+                            <input type="password" id="auth-password" class="manual-input" style="padding-left: 3.5rem;" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.8rem; font-size: 1.05rem;" id="auth-submit-btn">
+                        Sign In
+                    </button>
+                </form>
+                
+                <p class="auth-footer" style="text-align: center; margin-top: 2rem; color: var(--text-secondary); font-size: 0.9rem;">
+                    Don't have an account? <a href="#" id="toggle-auth-mode" style="color: var(--accent-primary); text-decoration: none; font-weight: 500;">Sign Up</a>
+                </p>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        lucide.createIcons();
+
+        // Listeners for Modal
+        overlay.querySelector('#close-auth').addEventListener('click', closeAuthModal);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeAuthModal();
+        });
+
+        const form = overlay.querySelector('#auth-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = overlay.querySelector('#auth-email').value;
+            // Mock Login Process
+            state.user = { email: email, name: email.split('@')[0] };
+            updateAuthUI();
+            closeAuthModal();
+        });
+
+        overlay.querySelector('#google-login-btn').addEventListener('click', () => {
+            // Mock Google Login
+            state.user = { email: 'user@gmail.com', name: 'Google User' };
+            updateAuthUI();
+            closeAuthModal();
+        });
+
+        let isSignUp = false;
+        overlay.querySelector('#toggle-auth-mode').addEventListener('click', function toggleMode(e) {
+            e.preventDefault();
+            isSignUp = !isSignUp;
+            const title = overlay.querySelector('#auth-title');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const toggleText = overlay.querySelector('.auth-footer');
+            if (isSignUp) {
+                title.textContent = 'Create an Account';
+                submitBtn.textContent = 'Sign Up';
+                toggleText.innerHTML = 'Already have an account? <a href="#" id="toggle-auth-mode-inner" style="color: var(--accent-primary); text-decoration: none; font-weight: 500;">Sign In</a>';
+            } else {
+                title.textContent = 'Welcome to EcoTrack';
+                submitBtn.textContent = 'Sign In';
+                toggleText.innerHTML = "Don't have an account? <a href=\"#\" id=\"toggle-auth-mode-inner\" style=\"color: var(--accent-primary); text-decoration: none; font-weight: 500;\">Sign Up</a>";
+            }
+            // re-attach listener
+            overlay.querySelector('#toggle-auth-mode-inner').addEventListener('click', toggleMode);
+        });
+    }
+    overlay.style.display = 'flex';
+}
+
+function closeAuthModal() {
+    const overlay = document.getElementById('auth-modal');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
 }
 
 // Boot application
