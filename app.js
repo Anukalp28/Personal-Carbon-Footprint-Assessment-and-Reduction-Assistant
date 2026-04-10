@@ -127,7 +127,7 @@ function handleRoute() {
     const hash = window.location.hash.slice(1) || 'landing';
 
     // Only allow valid views
-    if (['landing', 'questionnaire', 'results', 'manual-entry', 'dashboard', 'solutions'].includes(hash)) {
+    if (['landing', 'questionnaire', 'results', 'manual-entry', 'dashboard', 'solutions', 'about-us'].includes(hash)) {
         state.currentView = hash;
     } else {
         state.currentView = 'landing';
@@ -147,7 +147,7 @@ function renderView() {
     DOM.main.innerHTML = ''; // Clear current content
 
     // Update Nav Button based on context
-    if (state.currentView === 'landing' || state.currentView === 'results' || state.currentView === 'dashboard' || state.currentView === 'solutions') {
+    if (state.currentView === 'landing' || state.currentView === 'results' || state.currentView === 'dashboard' || state.currentView === 'solutions' || state.currentView === 'about-us') {
         DOM.navBtn.style.display = 'block';
         DOM.navBtn.textContent = 'Start Assessment';
     } else {
@@ -163,6 +163,9 @@ function renderView() {
             break;
         case 'solutions':
             DOM.main.appendChild(createSolutionsView());
+            break;
+        case 'about-us':
+            DOM.main.appendChild(createAboutUsView());
             break;
         case 'questionnaire':
             DOM.main.appendChild(createQuestionnaireView());
@@ -669,9 +672,9 @@ function createDashboardView() {
                 <h3>INFORMATION</h3>
                 <p>Read articles, research, and data regarding extreme climate shifts and sustainability.</p>
             </div>
-            <div class="dash-card">
-                <i data-lucide="users" class="dash-icon"></i>
-                <h3>ABOUT US</h3>
+            <div class="dash-card" id="dash-about-btn" style="cursor: pointer; border-color: var(--border-hover); background: rgba(16, 185, 129, 0.05);">
+                <i data-lucide="users" class="dash-icon" style="color: var(--accent-primary);"></i>
+                <h3 style="color: var(--accent-primary);">ABOUT US</h3>
                 <p>Learn more about our mission, vision, and the team driving EcoTrack forward.</p>
             </div>
         </div>
@@ -688,6 +691,114 @@ function createDashboardView() {
                 window.location.hash = '#solutions';
             });
         }
+        const aboutBtn = container.querySelector('#dash-about-btn');
+        if (aboutBtn) {
+            aboutBtn.addEventListener('click', () => {
+                window.location.hash = '#about-us';
+            });
+        }
+    }, 0);
+
+    return container;
+}
+
+function createAboutUsView() {
+    const container = document.createElement('div');
+    container.className = 'about-us-view';
+    // inline styles just for padding and width, similar to dashboard-view
+    container.style = "width: 100%; max-width: 900px; margin: 2rem auto; padding: 0 1rem; animation: fadeIn 0.4s ease-out;";
+
+    container.innerHTML = `
+        <div class="dashboard-header">
+            <h2><i data-lucide="globe" style="width: 36px; height: 36px; vertical-align: text-bottom; color: var(--accent-primary); margin-right: 0.5rem;"></i>About Us</h2>
+            <p style="color: var(--text-secondary);">Personal Carbon Footprint Assessment & Reduction Assistant 🌱💡</p>
+        </div>
+        
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <p style="color: var(--text-primary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 1rem;">
+                Welcome to our smart web-based platform designed to help individuals <strong>understand, measure, and reduce</strong> their environmental impact.
+            </p>
+            <p style="color: var(--text-secondary); line-height: 1.6;">
+                Our website calculates carbon emissions generated from daily activities such as 🚗 <strong>transportation</strong>, ⚡ <strong>energy consumption</strong>, 🥗 <strong>diet</strong>, 🛒 <strong>shopping</strong>, and ✈️ <strong>travel</strong>. With just a few inputs, users can discover how their lifestyle affects the planet <i data-lucide="globe" style="width: 16px; height: 16px; vertical-align: middle;"></i>.
+            </p>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
+                🎯 Our Mission
+            </h3>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+                Our goal is simple yet powerful — to <strong>raise awareness about climate change</strong> 🌡️ and inspire people to adopt <strong>eco-friendly and sustainable habits</strong> ♻️.
+            </p>
+            <p style="color: var(--text-secondary); line-height: 1.6;">
+                By providing <strong>accurate carbon estimates</strong> 📊 along with <strong>personalized suggestions</strong> 💡, we aim to guide users toward a <strong>greener, cleaner, and healthier future</strong> 🌿✨.
+            </p>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
+                ⚙️ How It Works
+            </h3>
+            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem; list-style-type: none;">
+                <li style="margin-bottom: 0.5rem;">🔹 Users enter their daily activity data</li>
+                <li style="margin-bottom: 0.5rem;">🔹 The system calculates their <strong>carbon footprint (kg CO₂)</strong></li>
+                <li style="margin-bottom: 1rem;">🔹 Smart suggestions are provided to <strong>reduce emissions</strong></li>
+            </ul>
+            <p style="color: var(--accent-primary); font-style: italic; text-align: center; margin-top: 1rem;">
+                👉 Measure ➝ Understand ➝ Improve 🌸
+            </p>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
+                👨‍💻 Our Team
+            </h3>
+            <p style="color: var(--text-secondary); line-height: 1.6;">
+                This project is developed by <strong>B.Tech (AI & ML) students</strong> 🎓 of <strong>Arka Jain University</strong> as part of an academic initiative focused on <strong>environmental sustainability <i data-lucide="globe" style="width: 16px; height: 16px; vertical-align: middle;"></i></strong> and <strong>innovation 💻</strong>.
+            </p>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
+                🌱 Our Belief
+            </h3>
+            <p style="color: var(--text-secondary); line-height: 1.6;">
+                We believe that <strong>small individual actions</strong> 🌼, when combined, can create <strong>big positive changes</strong> for our planet <i data-lucide="globe" style="width: 16px; height: 16px; vertical-align: middle;"></i> 💚.
+            </p>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 class="section-title" style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">
+                🔮 Future Vision
+            </h3>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+                In the future, we plan to enhance this platform with:
+            </p>
+            <ul style="color: var(--text-primary); line-height: 1.6; margin-left: 1.5rem; list-style-type: none;">
+                <li>✨ Real-time data tracking 📡</li>
+                <li>📱 Mobile application integration</li>
+                <li>🤖 AI-based smart recommendations</li>
+            </ul>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-top: 1rem;">
+                to make the system more <strong>intelligent, efficient, and user-friendly</strong> 🚀.
+            </p>
+        </div>
+        
+        <p style="color: var(--accent-primary); font-size: 1.2rem; font-style: italic; text-align: center; margin: 3rem 0; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            🌿 Together, let’s build a sustainable future! <i data-lucide="globe" style="width: 20px; height: 20px;"></i> 💚
+        </p>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn-outline" id="back-to-dashboard-btn" style="padding: 0.8rem 1.5rem;">
+                <i data-lucide="arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    `;
+
+    setTimeout(() => {
+        container.querySelector('#back-to-dashboard-btn').addEventListener('click', () => {
+            window.location.hash = '#dashboard';
+        });
     }, 0);
 
     return container;
