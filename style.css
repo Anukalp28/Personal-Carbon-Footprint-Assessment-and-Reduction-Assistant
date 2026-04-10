@@ -1248,3 +1248,36 @@ main {
     box-shadow: 0 0 0 3px rgba(30, 77, 58, 0.1);
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* PDF Button Bubble Hover Animation */
+#download-pdf-btn {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+#download-pdf-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: var(--accent-light);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
+}
+
+#download-pdf-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+#download-pdf-btn:hover {
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    background: transparent;
+}
