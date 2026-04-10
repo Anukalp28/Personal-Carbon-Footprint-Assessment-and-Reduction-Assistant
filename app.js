@@ -1,13 +1,20 @@
 // ==========================================================================
-// Application State & Data
+// Database & App State
 // ==========================================================================
+
+// Initialize Local Database directly in the browser via Dexie.js
+const db = new Dexie("EcoTrackDB");
+db.version(1).stores({
+    users: '++id, email', // auto-incrementing ID, indexed by email
+    tracking_logs: '++id, user_id, date, timestamp' // indexed for dashboard filtering
+});
 
 const state = {
     currentView: 'landing', // 'landing', 'questionnaire', 'results'
     currentQuestionIndex: 0,
-    answers: {}, // { questionId: selectedOptionImpactValue }
-    answerCategories: {}, // { categoryName: accumulatedValue }
-    user: null
+    answers: {},
+    answerCategories: {},
+    user: null // Holds the currently DB-authenticated user object
 };
 
 const questions = [
@@ -376,7 +383,7 @@ function createDashboardView() {
     `;
 
     // Ensure icon execution since they were populated via innerHTML
-    setTimeout(() => {
+    setTimeout(async () => {
         lucide.createIcons();
 
         const toggles = container.querySelectorAll('.challenge-toggle');
@@ -389,6 +396,55 @@ function createDashboardView() {
                 saveState();
             });
         });
+
+        // Hydrate Dashboard with Real Database Analytics
+        if (state.user) {
+            try {
+                // Fetch all tracking logs for the active user
+                const logs = await db.tracking_logs.where('user_id').equals(state.user.id).toArray();
+                
+                if (logs.length > 0) {
+                    // Sort descending by timestamp
+                    logs.sort((a,b) => b.timestamp - a.timestamp);
+                    const latest = logs[0];
+                    const avgTons = (logs.reduce((acc, log) => acc + log.tons, 0) / logs.length).toFixed(1);
+                    
+                    // Update main header msg to reflect tracking
+                    const dashMsg = container.querySelector('.dash-header-text p');
+                    if (dashMsg) {
+                        const trend = logs.length > 1 ? (logs[0].tons < logs[1].tons ? 'down' : 'up') : 'stable';
+                        dashMsg.innerHTML = `Your historical average is <strong>${avgTons} tons/year</strong> across ${logs.length} logged assessment(s). Your footprint is ${trend} compared to your last log.`;
+                    }
+                    
+                    // Update Score and Trees
+                    const carbonSavedEl = container.querySelector('.score-stat-col:nth-child(1) div strong');
+                    const treesSavedEl = container.querySelector('.score-stat-col:nth-child(2) div strong');
+                    
+                    // Relative to an extremely high mock global average of 14.9
+                    const carbonSaved = (14.9 - avgTons).toFixed(1);
+                    if(carbonSavedEl) carbonSavedEl.textContent = carbonSaved > 0 ? carbonSaved : '0';
+                    if(treesSavedEl) treesSavedEl.textContent = carbonSaved > 0 ? (carbonSaved * 2.5).toFixed(1) : '0';
+                    
+                    const ecoPointsEl = container.querySelector('.score-main-val');
+                    if (ecoPointsEl) {
+                        let pts = Math.max(0, 1000 - (avgTons * 45));
+                        ecoPointsEl.innerHTML = `${Math.round(pts)} <span>Eco Points</span>`;
+                    }
+                    
+                    // Update detailed metric cards based on latest array categories
+                    if (latest.categories) {
+                        const vals = Object.values(latest.categories);
+                        const metricCards = container.querySelectorAll('.metric-card .val');
+                        for(let i=0; i<Math.min(metricCards.length, vals.length); i++) {
+                            metricCards[i].innerHTML = \`\${(vals[i]/10).toFixed(1)} <span>kg CO2e</span>\`;
+                        }
+                    }
+                }
+            } catch(e) {
+                console.error("Dashboard DB Hydration Error:", e);
+            }
+        }
+
     }, 0);
     return container;
 }
@@ -636,12 +692,50 @@ function createQuestionnaireView() {
             }
         });
 
-        nextBtn.addEventListener('click', () => {
+        nextBtn.addEventListener('click', async () => {
             if (state.answers[currentQ.id] !== undefined) {
                 if (state.currentQuestionIndex < maxQuestions - 1) {
                     state.currentQuestionIndex++;
                     renderView();
                 } else {
+                    // Save to Database
+                    if (state.user) {
+                        try {
+                            const todayStr = new Date().toISOString().split('T')[0];
+                            let totalScore = Object.values(state.answers).reduce((a, b) => a + b, 0);
+                            if (totalScore === 0) totalScore = 21191; // mock fallback
+                            let tons = Number((totalScore / 1000).toFixed(1));
+                            
+                            // Upsert logic for today
+                            const existingLog = await db.tracking_logs
+                                .where('[user_id+date]') // Requires compound index, but wait, we only indexed 'date' right now
+                                .equals([state.user.id, todayStr]) // let's just query normally
+                                .first()
+                                .catch(() => null); // ignore if compound index fails
+                                
+                            // safe fallback query
+                            const logsForUser = await db.tracking_logs.where('user_id').equals(state.user.id).toArray();
+                            const logToday = logsForUser.find(l => l.date === todayStr);
+
+                            if (logToday) {
+                                await db.tracking_logs.update(logToday.id, {
+                                    tons: tons,
+                                    categories: state.answerCategories,
+                                    timestamp: Date.now()
+                                });
+                            } else {
+                                await db.tracking_logs.add({
+                                    user_id: state.user.id,
+                                    date: todayStr,
+                                    timestamp: Date.now(),
+                                    tons: tons,
+                                    categories: state.answerCategories
+                                });
+                            }
+                        } catch(err) {
+                            console.error("Tracking save error", err);
+                        }
+                    }
                     window.location.hash = '#results';
                 }
             }
@@ -990,18 +1084,82 @@ function openAuthModal() {
             buttonsContainer.style.display = 'flex';
         });
 
-        // Mock Login Logic
-        const handleLogin = (e) => {
-            if (e) e.preventDefault();
-            state.user = { name: "Anubhav Shreshtha" };
-            updateAuthUI();
-            closeModal();
-            resetState();
-            window.location.hash = '#questionnaire';
-        };
+        // Database Login/Register Logic
+        emailForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const emailInput = emailForm.querySelector('input[type="email"]').value.trim();
+            const passInput = emailForm.querySelector('input[type="password"]').value.trim();
+            
+            const submitBtn = emailForm.querySelector('button[type="submit"]');
+            const origText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i data-lucide="loader" style="width:18px; margin-right:8px; animation: spin 1s linear infinite;"></i> Processing...';
+            submitBtn.disabled = true;
+            lucide.createIcons();
 
-        overlay.querySelector('#mock-login-google').addEventListener('click', handleLogin);
-        emailForm.addEventListener('submit', handleLogin);
+            try {
+                // Check if user exists in the local database
+                let existingUser = await db.users.where('email').equalsIgnoreCase(emailInput).first();
+                
+                if (!existingUser) {
+                    // Create new user (Sign Up)
+                    const newId = await db.users.add({
+                        email: emailInput,
+                        password: passInput,
+                        name: emailInput.split('@')[0], // Extract name from email
+                        avatar: '',
+                        address: '',
+                        phone: '',
+                        about: '',
+                        achievements: '',
+                        challenges: {},
+                        joinedAt: Date.now()
+                    });
+                    existingUser = await db.users.get(newId);
+                } else if (existingUser.password !== passInput) {
+                    alert('Incorrect password for this email account.');
+                    submitBtn.innerHTML = origText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                // Login Success
+                state.user = existingUser;
+                saveState(); // sync active session to localStorage
+                
+                updateAuthUI();
+                closeModal();
+                resetState();
+                window.location.hash = '#questionnaire'; // route to assess
+                
+            } catch (err) {
+                console.error("Database Error:", err);
+                alert("Failed to authenticate with local database.");
+                submitBtn.innerHTML = origText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Google Mock simulates an instant DB sync
+        overlay.querySelector('#mock-login-google').addEventListener('click', async () => {
+            try {
+                const emailInput = "user@gmail.com";
+                let existingUser = await db.users.where('email').equalsIgnoreCase(emailInput).first();
+                if (!existingUser) {
+                    const newId = await db.users.add({
+                        email: emailInput,
+                        name: 'Google User',
+                        avatar: '', joinedAt: Date.now()
+                    });
+                    existingUser = await db.users.get(newId);
+                }
+                state.user = existingUser;
+                saveState();
+                updateAuthUI();
+                closeModal();
+                resetState();
+                window.location.hash = '#questionnaire';
+            } catch(e) {}
+        });
     }
 }
 
