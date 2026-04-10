@@ -46,11 +46,11 @@ Proudly designed and engineered by our team of 5 B.Tech (AI & ML) students for *
 
 | Name | Role / Focus | Link |
 | :--- | :--- | :--- |
-| **[Contributor 1 Name]** | _Lead Developer & Architect_ | [GitHub Profile](#) |
-| **[Contributor 2 Name]** | _Frontend Specialist_ | [GitHub Profile](#) |
-| **[Contributor 3 Name]** | _Calculations & Algorithms_ | [GitHub Profile](#) |
-| **[Contributor 4 Name]** | _Research & Integration_ | [GitHub Profile](#) |
-| **[Contributor 5 Name]** | _UI/UX & Documentation_ | [GitHub Profile](#) |
+| **Anukalp Raj** | _Design Architect & Lead Engineer_ | [GitHub Profile](https://github.com/Anukalp28) |
+| **Subhradeep sur** | _Frontend Specialist & UI/UX_ | [GitHub Profile](https://github.com/Subhradeep7845) |
+| **Ankit Kumar** | _Backend & Debugging_ | [GitHub Profile](https://github.com/ankitkumar6202) |
+| **Atufa Khan** | _Research & Integration_ | [GitHub Profile](https://github.com/atufa2603-ops) |
+| **Arpita Aarushi Lala** | _Documentation & Presentation_ | [GitHub Profile](https://github.com/aarushiarpita-ux) |
 
 <br/>
 
