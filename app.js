@@ -94,6 +94,11 @@ const DOM = {
 
 function saveState() {
     localStorage.setItem('ecoTrackState', JSON.stringify(state));
+    if (state.user && state.user.id) {
+        db.users.put(state.user).catch(err => {
+            console.error('User DB sync error:', err);
+        });
+    }
 }
 
 function loadState() {
@@ -110,14 +115,39 @@ function loadState() {
     }
 }
 
-function init() {
+async function hydrateUserFromDb() {
+    if (!state.user) return;
+
+    try {
+        let dbUser = null;
+
+        if (state.user.id) {
+            dbUser = await db.users.get(state.user.id);
+        } else if (state.user.email) {
+            dbUser = await db.users.where('email').equalsIgnoreCase(state.user.email).first();
+        }
+
+        if (dbUser) {
+            state.user = { ...dbUser, ...state.user };
+            saveState();
+        }
+    } catch (e) {
+        console.error('Failed to hydrate user from DB', e);
+    }
+}
+
+async function init() {
     loadState();
+    await hydrateUserFromDb();
+    initThemePreference();
     setupGlobalListeners();
     handleRoute();
 }
 
 function setupGlobalListeners() {
     window.addEventListener('hashchange', handleRoute);
+    setupCursorGlow();
+    setupThemeToggle();
 
     const signinBtn = document.getElementById('signin-nav-btn');
     if (signinBtn) {
@@ -143,6 +173,134 @@ function setupGlobalListeners() {
 
     // Setup AI Chatbot
     setupChatbot();
+}
+
+function getStoredTheme() {
+    return localStorage.getItem('ecoTrackTheme');
+}
+
+function resolvePreferredTheme() {
+    if (state.user && state.user.theme) return state.user.theme;
+    const stored = getStoredTheme();
+    if (stored) return stored;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function updateThemeToggleUI(theme) {
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+    const isDark = theme === 'dark';
+    toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+    toggle.setAttribute('aria-label', isDark ? 'Activate light mode' : 'Activate dark mode');
+    const icon = toggle.querySelector('.theme-toggle-icon');
+    if (icon) {
+        icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+    }
+    toggle.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+    }
+}
+
+function applyTheme(theme, { persist = true } = {}) {
+    const normalized = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', normalized);
+    updateThemeToggleUI(normalized);
+
+    if (!persist) return;
+
+    localStorage.setItem('ecoTrackTheme', normalized);
+    if (state.user) {
+        state.user.theme = normalized;
+        saveState();
+    }
+}
+
+function initThemePreference() {
+    const preferred = resolvePreferredTheme();
+    applyTheme(preferred, { persist: false });
+
+    if (state.user && !state.user.theme) {
+        state.user.theme = preferred;
+        saveState();
+    }
+}
+
+function setupThemeToggle() {
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+
+    updateThemeToggleUI(resolvePreferredTheme());
+
+    toggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+    });
+}
+
+function setupCursorGlow() {
+    const root = document.documentElement;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let targetX = window.innerWidth * 0.5;
+    let targetY = window.innerHeight * 0.35;
+    let currentX = targetX;
+    let currentY = targetY;
+    let lastTime = performance.now();
+
+    root.style.setProperty('--glow-x', `${targetX}px`);
+    root.style.setProperty('--glow-y', `${targetY}px`);
+
+    const handleMove = (point) => {
+        targetX = point.clientX;
+        targetY = point.clientY;
+        if (prefersReducedMotion) {
+            root.style.setProperty('--glow-opacity', '0.25');
+        }
+    };
+
+    window.addEventListener('mousemove', (e) => handleMove(e), { passive: true });
+    window.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) handleMove(e.touches[0]);
+    }, { passive: true });
+
+    window.addEventListener('mouseleave', () => {
+        root.style.setProperty('--glow-opacity', '0.2');
+    });
+
+    window.addEventListener('blur', () => {
+        root.style.setProperty('--glow-opacity', '0.15');
+    });
+
+    if (prefersReducedMotion) return;
+
+    const minSize = 260;
+    const maxSize = 520;
+
+    const update = (time) => {
+        const dt = Math.max(16, time - lastTime);
+        lastTime = time;
+
+        const dx = targetX - currentX;
+        const dy = targetY - currentY;
+        currentX += dx * 0.12;
+        currentY += dy * 0.12;
+
+        const dist = Math.hypot(dx, dy);
+        const speed = Math.min(1, (dist / dt) * 0.4);
+        const size = maxSize - (maxSize - minSize) * speed;
+        const opacity = 0.35 + speed * 0.45;
+
+        root.style.setProperty('--glow-x', `${currentX.toFixed(1)}px`);
+        root.style.setProperty('--glow-y', `${currentY.toFixed(1)}px`);
+        root.style.setProperty('--glow-size', `${size.toFixed(0)}px`);
+        root.style.setProperty('--glow-opacity', opacity.toFixed(2));
+
+        requestAnimationFrame(update);
+    };
+
+    requestAnimationFrame(update);
 }
 
 function handleRoute() {
@@ -677,7 +835,7 @@ function createProfileView() {
         const form = container.querySelector('#profile-form');
         const imgPreview = container.querySelector('#profile-preview-img');
         const fileInput = container.querySelector('#profile-avatar-file');
-        let currentBase64Avatar = state.user?.avatar || null;
+        let currentBase64Avatar = state.user?.avatar || '';
 
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -691,7 +849,7 @@ function createProfileView() {
             }
         });
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = container.querySelector('#profile-name').value;
             const email = container.querySelector('#profile-email').value;
@@ -703,26 +861,44 @@ function createProfileView() {
             const about = container.querySelector('#profile-about').value;
             const achievements = container.querySelector('#profile-achievements').value;
 
-            state.user.name = name;
-            state.user.email = email;
-            state.user.phone = phone;
-            state.user.dob = dob;
-            state.user.gender = gender;
-            state.user.score = score;
-            state.user.address = address;
-            state.user.about = about;
-            state.user.achievements = achievements;
-
-            if (currentBase64Avatar) {
-                state.user.avatar = currentBase64Avatar;
-            } else {
-                delete state.user.avatar;
+            const saveBtn = form.querySelector('button[type="submit"]');
+            const originalText = saveBtn ? saveBtn.innerHTML : '';
+            if (saveBtn) {
+                saveBtn.innerHTML = 'Saving...';
+                saveBtn.disabled = true;
             }
 
-            saveState();
-            updateAuthUI();
+            const updatedUser = {
+                ...state.user,
+                name,
+                email,
+                phone,
+                dob,
+                gender,
+                score,
+                address,
+                about,
+                achievements,
+                avatar: currentBase64Avatar || ''
+            };
 
-            window.location.hash = '#landing';
+            try {
+                state.user = updatedUser;
+                if (state.user && state.user.id) {
+                    await db.users.put(state.user);
+                }
+                saveState();
+                updateAuthUI();
+                window.location.hash = '#landing';
+            } catch (err) {
+                console.error('Profile save error:', err);
+                alert('Failed to save changes. Please try again.');
+            } finally {
+                if (saveBtn && saveBtn.isConnected) {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                }
+            }
         });
     }, 0);
 
@@ -1340,6 +1516,7 @@ function openAuthModal() {
                 
                 // Login Success
                 state.user = existingUser;
+                applyTheme(resolvePreferredTheme());
                 saveState(); // sync active session to localStorage
                 
                 updateAuthUI();
@@ -1369,6 +1546,7 @@ function openAuthModal() {
                     existingUser = await db.users.get(newId);
                 }
                 state.user = existingUser;
+                applyTheme(resolvePreferredTheme());
                 saveState();
                 updateAuthUI();
                 closeModal();
